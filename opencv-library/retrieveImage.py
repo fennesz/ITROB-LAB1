@@ -8,7 +8,7 @@ import os
 from twisted.protocols.ftp import FileNotFoundError
 import datetime
 
-class retrieve_image:
+class RetrieveImage:
     BUFFER_SIZE = 64500
 
     def get_from_file(self, filename):
@@ -53,7 +53,7 @@ def __fail_parameters():
     exit(1)
 
 if __name__ == '__main__':
-    retrImg = retrieve_image()
+    retrImg = RetrieveImage()
     if len(sys.argv) < 2 or len(sys.argv) > 4:
         __fail_parameters()
     option = sys.argv[1]
