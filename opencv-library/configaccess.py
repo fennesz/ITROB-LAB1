@@ -1,23 +1,37 @@
 import json
+import os
 from threading import Thread,Event
 
 class RecurringConfigReader(Thread):
+    configUpdateRate = 5
+
     def __init__(self, event, configName):
         Thread.__init__(self)
+        self.fileReader = FileReader(configName)
         self.stopped = event
-        self.configName = configName
 
     def run(self):
-        while not self.stopped.wait(5):
-            print("Reading config...")
-            ConfigAccessor.data = FileReader.read_data(self.configName)
+        while not self.stopped.wait(self.configUpdateRate):
+            ConfigAccessor.data = self.fileReader.read_data()
+            self.configUpdateRate = ConfigAccessor.data['configUpdateRate']
             print "Data in ReccuringConfigReader: " + str(ConfigAccessor.data)
 
 class FileReader:
-    @staticmethod
-    def read_data(configName):
-        with open(configName, 'r') as f:
-            return json.load(f)
+    def __init__(self, configName):
+        self.configName = configName
+        self.modifiedDate = os.path.getmtime(configName)
+        with open(self.configName, 'r') as f:
+            self.data = json.load(f)
+
+    def read_data(self):
+        updatedDate = os.path.getmtime(self.configName)
+        if updatedDate == self.modifiedDate:
+            return self.data
+        with open(self.configName, 'r') as f:
+            print "The configfile changed, reloading values"
+            self.data = json.load(f)
+            self.modifiedDate = updatedDate
+            return self.data
 
 class FileWriter:
     @staticmethod
@@ -31,7 +45,7 @@ class ConfigAccessor:
     def __init__(self, configName):
         ConfigAccessor.configName = configName + ".json"
         try:
-            ConfigAccessor.data = FileReader.read_data(self.configName)
+            ConfigAccessor.data = FileReader(ConfigAccessor.configName).read_data()
         except IOError:
             self.__populate_default_data()
             FileWriter.write_data(self.configName, ConfigAccessor.data)
@@ -42,7 +56,9 @@ class ConfigAccessor:
 
     def __populate_default_data(self):
         ConfigAccessor.data = {
-            'exposure' : 1
+            'exposure' : 1,
+            'configUpdateRate': 5,
+	        'webcamFPS': 0.1
         }
 
     def __exit__(self):

@@ -1,1 +1,5 @@
-{"exposure": 3}
+{
+	"exposure": 1,
+	"configUpdateRate": 60,
+	"webcamFPS": 0.4 
+}
