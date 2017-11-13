@@ -1,4 +1,5 @@
 import sys
+import math
 
 from appJar import gui
 from configaccess import ConfigAccessor
@@ -6,6 +7,9 @@ from configaccess import ConfigAccessor
 class VisionGui:
     def __init__(self, cfg):
         self.cfg = cfg
+        self.modifiedScaleValue = 1
+
+
         self.populateStartValues()
         self.app = gui()
         self.app.setFont(10)
@@ -31,14 +35,34 @@ class VisionGui:
         self.webcamFPSValue = self.app.addScale("webcamFPS", 4, 1)
         self.app.setScaleRange("webcamFPS", 1, 10000, self.webcamFPSValueDefault)
         self.app.showScaleValue("webcamFPS", show=True)
+        #Below can be removed (Attempt to scale depending on scale value)
+        #self.app.setScaleChangeFunction("webcamFPS", self.onIntervalChange)
 
         self.app.addButton("Save", func=self.saveValues)
-
-
 
     def onExit(self):
         self.cfg.stopFlag.set()
         return True
+
+    def onIntervalChange(self, title):
+        value = self.app.getScale("webcamFPS") / 10000.0
+        if(value < 0.33): # 0-33% = 1-100
+            value = value * 100
+        elif(value < 0.66):# 33-66% = 100-1000
+            value = value * 1000
+        elif(value < 1.001):# 66-100% = 1000-10000
+            value = value * 10000
+
+        self.modifiedScaleValue = self.nearestToCurrentOrderOfMagnitude(value)
+        self.app.setLabel("webcamFPS", self.modifiedScaleValue)
+        return
+
+
+    def nearestToCurrentOrderOfMagnitude(self, t):
+        power = math.floor(math.log10(t))
+        nearest = math.floor(t / math.pow(10, power)) * math.pow(10, power)
+        return nearest
+
 
     def execute(self):
         self.app.setStopFunction(self.onExit)
