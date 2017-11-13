@@ -3,19 +3,20 @@ from debugger import Debugger
 from configaccess import ConfigAccessor
 import sys
 
-cfg = ConfigAccessor('tenderbot')
+CONFIG_FILENAME = 'tenderbot'
+
+cfg = ConfigAccessor(CONFIG_FILENAME)
 
 '''DEBUG VALUES'''
 DEBUG = True
-FPS = ConfigAccessor.data['webcamFPS']
-MS_PER_FRAME = 1000 / FPS
 
 imgrtriever = RetrieveImage()
 while True:
     try:
-        img = imgrtriever.get_from_webcam("http://nano.pse.umass.edu:81/axis-cgi/jpg/image.cgi?resolution=640x480", ConfigAccessor.data['exposure'])
+        img = imgrtriever.get_from_webcam("http://nano.pse.umass.edu:81/axis-cgi/jpg/image.cgi?resolution=640x480", cfg.data['exposure'])
         if (DEBUG):
-            Debugger.show_image(img, MS_PER_FRAME)
+            FPS = float(cfg.data['webcamFPS'])
+            Debugger.show_image(img, FPS)
     except KeyboardInterrupt:
         ConfigAccessor.stopFlag.set()
         sys.exit(0)

@@ -16,6 +16,7 @@ class RecurringConfigReader(Thread):
             self.configUpdateRate = ConfigAccessor.data['configUpdateRate']
             print "Data in ReccuringConfigReader: " + str(ConfigAccessor.data)
 
+
 class FileReader:
     def __init__(self, configName):
         self.configName = configName
@@ -53,6 +54,10 @@ class ConfigAccessor:
             ConfigAccessor.stopFlag = Event()
             ConfigAccessor.confReader = RecurringConfigReader(ConfigAccessor.stopFlag, self.configName)
             ConfigAccessor.confReader.start()
+
+    def setValue(self, key, value):
+        ConfigAccessor.data[key] = value
+        FileWriter.write_data(self.configName, ConfigAccessor.data)
 
     def __populate_default_data(self):
         ConfigAccessor.data = {
