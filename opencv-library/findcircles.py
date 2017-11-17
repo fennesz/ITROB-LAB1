@@ -25,7 +25,7 @@ def get_from_file(filename):
 	else:
 		print "Couldn't find file: " + filename
 		raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), filename)
-	
+
 	file = cv2.medianBlur(file,5) #reduce noise in picture
 
 #Colour information is present within the specified range
@@ -56,7 +56,6 @@ def threshold_image(image,debug=False):
     return closing
 
 def show_circles(image,debug=False):
-	grey_file = cv2.cvtColor(file,cv2.COLOR_BGR2GRAY) #turn image to grayscale ---> turn back to colour later
 
 	#locate circles in the picture
 	circles = cv2.HoughCircles(file, cv2.HOUGH_GRADIENT,1,20,param1=50,param2=30,minRadius=0,maxRadius=0)
