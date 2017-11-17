@@ -34,6 +34,7 @@ class FileReader:
             self.modifiedDate = updatedDate
             return self.data
 
+
 class FileWriter:
     @staticmethod
     def write_data(configName, data):
@@ -47,7 +48,7 @@ class ConfigAccessor:
         ConfigAccessor.configName = configName + ".json"
         try:
             ConfigAccessor.data = FileReader(ConfigAccessor.configName).read_data()
-        except IOError:
+        except OSError:
             self.__populate_default_data()
             FileWriter.write_data(self.configName, ConfigAccessor.data)
         finally:
@@ -63,7 +64,8 @@ class ConfigAccessor:
         ConfigAccessor.data = {
             'exposure' : 1,
             'configUpdateRate': 5,
-	        'webcamFPS': 0.1
+	        'webcamFPS': 5000.0,
+            'isDebug': False
         }
 
     def __exit__(self):

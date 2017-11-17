@@ -38,6 +38,10 @@ class VisionGui:
         #Below can be removed (Attempt to scale depending on scale value)
         #self.app.setScaleChangeFunction("webcamFPS", self.onIntervalChange)
 
+        self.app.addLabel("isDebug", "Debug: ", 5, 0)
+        self.debugValue = self.app.addCheckBox("isDebug", 5, 1)
+        self.app.setCheckBox("isDebug", ticked=self.debugValueDefault)
+
         self.app.addButton("Save", func=self.saveValues)
 
     def onExit(self):
@@ -72,12 +76,14 @@ class VisionGui:
         self.exposureValueDefault = cfg.data['exposure']
         self.configUpdateRateValueDefault = cfg.data['configUpdateRate']
         self.webcamFPSValueDefault = cfg.data['webcamFPS']
+        self.debugValueDefault = cfg.data['isDebug']
         self.cfg.stopFlag.set()
 
     def saveValues(self, arg):
         cfg.setValue('exposure', self.exposureValue.get())
         cfg.setValue('configUpdateRate', self.configUpdateRateValue.get())
         cfg.setValue('webcamFPS', float(self.webcamFPSValue.get()))
+        cfg.setValue('isDebug', self.app.getCheckBox("isDebug"))
 
 if __name__ == '__main__':
     cfg = ConfigAccessor('tenderbot')

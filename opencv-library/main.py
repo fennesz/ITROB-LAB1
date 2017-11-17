@@ -13,9 +13,10 @@ DEBUG = True
 imgrtriever = RetrieveImage()
 while True:
     try:
+        DEBUG = cfg.data['isDebug']
+        FPS = float(cfg.data['webcamFPS'])
         img = imgrtriever.get_from_webcam("http://nano.pse.umass.edu:81/axis-cgi/jpg/image.cgi?resolution=640x480", cfg.data['exposure'])
         if (DEBUG):
-            FPS = float(cfg.data['webcamFPS'])
             Debugger.show_image(img, FPS)
     except KeyboardInterrupt:
         ConfigAccessor.stopFlag.set()
