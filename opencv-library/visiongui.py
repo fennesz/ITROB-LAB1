@@ -42,6 +42,11 @@ class VisionGui:
         self.debugValue = self.app.addCheckBox("isDebug", 5, 1)
         self.app.setCheckBox("isDebug", ticked=self.debugValueDefault)
 
+        self.app.addLabel("thresholdValue", "Threshold Value: ", 6, 0)
+        self.thresholdValue = self.app.addScale("thresholdValue", 6, 1)
+        self.app.setScaleRange("thresholdValue", 5, 255, self.thresholdValueDefault)
+        self.app.showScaleValue("thresholdValue", show=True)
+
         self.app.addButton("Save", func=self.saveValues)
 
     def onExit(self):
@@ -77,6 +82,7 @@ class VisionGui:
         self.configUpdateRateValueDefault = cfg.data['configUpdateRate']
         self.webcamFPSValueDefault = cfg.data['webcamFPS']
         self.debugValueDefault = cfg.data['isDebug']
+        self.thresholdValueDefault = cfg.data['thresholdValue']
         self.cfg.stopFlag.set()
 
     def saveValues(self, arg):
@@ -84,6 +90,7 @@ class VisionGui:
         cfg.setValue('configUpdateRate', self.configUpdateRateValue.get())
         cfg.setValue('webcamFPS', float(self.webcamFPSValue.get()))
         cfg.setValue('isDebug', self.app.getCheckBox("isDebug"))
+        cfg.setValue('thresholdValue', self.thresholdValue.get())
 
 if __name__ == '__main__':
     cfg = ConfigAccessor('tenderbot')
