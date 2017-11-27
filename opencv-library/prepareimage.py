@@ -32,11 +32,8 @@ class PrepareImage:
         combination of dilate and erode
         """
         ret,th1 = cv2.threshold(self.imageGrey, self.cfgAccessor.data['thresholdValue'],255,cv2.THRESH_BINARY)
-        if debug: cv2.imshow('th1',th1)
         resdi = cv2.dilate(th1,np.ones((3,3),np.uint8))
-        if debug: cv2.imshow('dilated',resdi)
         closing = cv2.morphologyEx(resdi, cv2.MORPH_CLOSE,np.ones((5,5),np.uint8))
-        if debug: cv2.imshow('closing',closing)
         return closing
 
     #Colour information is present within the specified range

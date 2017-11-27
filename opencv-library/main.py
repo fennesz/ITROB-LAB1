@@ -18,11 +18,12 @@ while True:
         DEBUG = cfg.data['isDebug']
         FPS = float(cfg.data['webcamFPS'])
         if (len(sys.argv) < 2):
-            img = imgrtriever.get_from_webcam("http://nano.pse.umass.edu:81/axis-cgi/jpg/image.cgi?resolution=640x480", cfg.data['exposure'])
+            img = imgrtriever.get_from_webcam("http://192.168.0.20/image/jpeg.cgi", cfg.data['exposure'])
         else:
             img = imgrtriever.get_from_file(sys.argv[1])
         imgPreparer = PrepareImage(image=img, cfgAccessor=cfg)
-        objectRgn = ObjectRecognizer(img, cfgAccessor=cfg)
+        treshholded_img = imgPreparer.threshold_image(img)
+        objectRgn = ObjectRecognizer(treshholded_img, cfgAccessor=cfg)
         circleImg = objectRgn.find_and_draw_circles()
 
         if (DEBUG):

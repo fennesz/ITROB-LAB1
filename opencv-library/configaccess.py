@@ -65,8 +65,14 @@ class ConfigAccessor:
             'exposure' : 1,
             'configUpdateRate': 5,
 	        'webcamFPS': 5000.0,
-            'isDebug': False,
+            'isDebug': True,
             'thresholdValue': 50,
+            'dp': 1,
+            'minDistance': 20,
+            'minRadius': 0,
+            'maxRadius': 120,
+            'param1': 100,
+            'param2': 10
         }
 
     def __exit__(self):

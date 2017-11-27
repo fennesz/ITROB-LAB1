@@ -14,7 +14,7 @@ class VisionGui:
         self.app = gui()
         self.app.setFont(10)
 
-        self.app.setGeometry("500x200") #Size of window
+        self.app.setGeometry("500x500") #Size of window
         self.app.addLabel("title", "'tenderBot configurator", row=0, colspan=2)
         self.app.addHorizontalSeparator(colspan=2, row=1)
         self.app.addLabel("exposure", "Exposure: ", 2, 0)
@@ -46,6 +46,37 @@ class VisionGui:
         self.thresholdValue = self.app.addScale("thresholdValue", 6, 1)
         self.app.setScaleRange("thresholdValue", 5, 255, self.thresholdValueDefault)
         self.app.showScaleValue("thresholdValue", show=True)
+
+
+        self.app.addLabel("dpValue", "Webcam DP:", 7, 0)
+        self.dpValue = self.app.addScale("dpValue", 7, 1)
+        self.app.setScaleRange("dpValue", 1, 10, self.dpValueDefault)
+        self.app.showScaleValue("dpValue", show=True)
+
+        self.app.addLabel("minRadius", "Circle minRadius:", 8, 0)
+        self.minRadiusValue = self.app.addScale("minRadius", 8, 1)
+        self.app.setScaleRange("minRadius", 1, 50, self.minRadiusValueDefault)
+        self.app.showScaleValue("minRadius", show=True)
+
+        self.app.addLabel("maxRadius", "Circle maxRadius:", 9, 0)
+        self.maxRadiusValue = self.app.addScale("maxRadius", 9, 1)
+        self.app.setScaleRange("maxRadius", 50, 150, self.maxRadiusValueDefault)
+        self.app.showScaleValue("maxRadius", show=True)
+
+        self.app.addLabel("param1", "Circle param1:", 10, 0)
+        self.paramOneValue = self.app.addScale("param1", 10, 1)
+        self.app.setScaleRange("param1", 1, 500, self.paramOneValueDefault)
+        self.app.showScaleValue("param1", show=True)
+
+        self.app.addLabel("param2", "Circle param2:", 11, 0)
+        self.paramTwoValue = self.app.addScale("param2", 11, 1)
+        self.app.setScaleRange("param2", 1, 500, self.paramTwoValueDefault)
+        self.app.showScaleValue("param2", show=True)
+
+        self.app.addLabel("minDistance", "Circle minDistance:", 12, 0)
+        self.paramMinDistanceValue = self.app.addScale("minDistance", 12, 1)
+        self.app.setScaleRange("minDistance", 1, 500, self.paramminDistanceValueDefault)
+        self.app.showScaleValue("minDistance", show=True)
 
         self.app.addButton("Save", func=self.saveValues)
 
@@ -83,6 +114,12 @@ class VisionGui:
         self.webcamFPSValueDefault = cfg.data['webcamFPS']
         self.debugValueDefault = cfg.data['isDebug']
         self.thresholdValueDefault = cfg.data['thresholdValue']
+        self.dpValueDefault = cfg.data['dp']
+        self.minRadiusValueDefault = cfg.data['minRadius']
+        self.maxRadiusValueDefault = cfg.data['maxRadius']
+        self.paramOneValueDefault = cfg.data['param1']
+        self.paramTwoValueDefault = cfg.data['param2']
+        self.paramminDistanceValueDefault = cfg.data['minDistance']
         self.cfg.stopFlag.set()
 
     def saveValues(self, arg):
@@ -91,6 +128,12 @@ class VisionGui:
         cfg.setValue('webcamFPS', float(self.webcamFPSValue.get()))
         cfg.setValue('isDebug', self.app.getCheckBox("isDebug"))
         cfg.setValue('thresholdValue', self.thresholdValue.get())
+        cfg.setValue('dp', self.dpValue.get())
+        cfg.setValue('minRadius', self.minRadiusValue.get())
+        cfg.setValue('maxRadius', self.maxRadiusValue.get())
+        cfg.setValue('param1', self.paramOneValue.get())
+        cfg.setValue('param2', self.paramTwoValue.get())
+        cfg.setValue('minDistance', self.paramMinDistanceValue.get())
 
 if __name__ == '__main__':
     cfg = ConfigAccessor('tenderbot')
