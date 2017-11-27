@@ -7,12 +7,14 @@ from camera_sensor.srv import *
 
 nodeName = "Camera" # Figure out how to set this from
                     # Arguments
+
 n = roshelper.Node(nodeName, anonymous=False)
 
 # A class for the camera, requires image getting code
 @n.entry_point()
 class Camera(object):
     get_qr_codes = None
+    get_qr_codes_service = None
     
     # Current raw image
     raw_image = None
@@ -44,9 +46,9 @@ class Camera(object):
 
     # Private function that sets up the service handlers
     def __setup_services(self):
-        self.desired_pos_service = rospy.Service(nodeName + '/get_qr_codes',     # Name of service
-                                                 get_qr_codes,                   # Service to implement
-                                                 self.handle_get_qr_codes)       # Handler for service
+        self.get_qr_codes_service = rospy.Service(nodeName + '/get_qr_codes',     # Name of service
+                                                  get_qr_codes,                   # Service to implement
+                                                  self.handle_get_qr_codes)       # Handler for service
 
     # function that handles requests to the position service
     def handle_get_qr_codes(self, req):
