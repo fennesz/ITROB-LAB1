@@ -9,7 +9,6 @@ class VisionGui:
         self.cfg = cfg
         self.modifiedScaleValue = 1
 
-
         self.populateStartValues()
         self.app = gui()
         self.app.setFont(10)
@@ -47,10 +46,9 @@ class VisionGui:
         self.app.setScaleRange("thresholdValue", 5, 255, self.thresholdValueDefault)
         self.app.showScaleValue("thresholdValue", show=True)
 
-
-        self.app.addLabel("dpValue", "Webcam DP:", 7, 0)
+        self.app.addLabel("dpValue", "Webcam DP*100:", 7, 0)
         self.dpValue = self.app.addScale("dpValue", 7, 1)
-        self.app.setScaleRange("dpValue", 1, 10, self.dpValueDefault)
+        self.app.setScaleRange("dpValue", 1, 500, self.dpValueDefault)
         self.app.showScaleValue("dpValue", show=True)
 
         self.app.addLabel("minRadius", "Circle minRadius:", 8, 0)
@@ -114,7 +112,7 @@ class VisionGui:
         self.webcamFPSValueDefault = cfg.data['webcamFPS']
         self.debugValueDefault = cfg.data['isDebug']
         self.thresholdValueDefault = cfg.data['thresholdValue']
-        self.dpValueDefault = cfg.data['dp']
+        self.dpValueDefault = int(cfg.data['dp'] * 100)
         self.minRadiusValueDefault = cfg.data['minRadius']
         self.maxRadiusValueDefault = cfg.data['maxRadius']
         self.paramOneValueDefault = cfg.data['param1']
@@ -128,7 +126,7 @@ class VisionGui:
         cfg.setValue('webcamFPS', float(self.webcamFPSValue.get()))
         cfg.setValue('isDebug', self.app.getCheckBox("isDebug"))
         cfg.setValue('thresholdValue', self.thresholdValue.get())
-        cfg.setValue('dp', self.dpValue.get())
+        cfg.setValue('dp', float(self.dpValue.get()) / 100)
         cfg.setValue('minRadius', self.minRadiusValue.get())
         cfg.setValue('maxRadius', self.maxRadiusValue.get())
         cfg.setValue('param1', self.paramOneValue.get())
