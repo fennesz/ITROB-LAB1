@@ -13,7 +13,7 @@ class RetrieveImage:
 
     def get_from_file(self, filename):
 		print "Loading from file..."
-		file = cv2.imread(filename)
+		file = cv2.imread(filename, 0)
 		if file is not None:
 			print "Succesfully loaded file"
 			return file
@@ -34,7 +34,7 @@ class RetrieveImage:
             if a != -1 and b != -1:
                 jpg = bytes[a:b+2]
                 bytes= bytes[b+2:]
-                tmp = cv2.imdecode(np.fromstring(jpg, dtype=np.uint8),cv2.CV_LOAD_IMAGE_COLOR)
+                tmp = cv2.imdecode(np.fromstring(jpg, dtype=np.uint8),cv2.CV_LOAD_IMAGE_GRAYSCALE)
             else:
                 raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), "Try increasing buffersize")
             if img is not '':

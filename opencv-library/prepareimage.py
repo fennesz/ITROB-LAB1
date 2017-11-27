@@ -14,9 +14,10 @@ class PrepareImage:
         self.cfgAccessor = cfgAccessor
         self.image = image
         self.reducedNoiseImage = self.reduce_picturenoise(self.image)
-        self.imageGrey = self.__greyscale(self.reducedNoiseImage)
+        self.imageGrey = image#self.greyscale(self.reducedNoiseImage)
 
-    def __greyscale(self, file):
+    @staticmethod
+    def greyscale(file):
         return cv2.cvtColor(file,cv2.COLOR_BGR2GRAY) #turn image to grayscale ---> turn back to colour later
 
     #reduce noise in picture

@@ -22,8 +22,7 @@ while True:
         else:
             img = imgrtriever.get_from_file(sys.argv[1])
         imgPreparer = PrepareImage(image=img, cfgAccessor=cfg)
-        thresholdedImage = imgPreparer.threshold_image()
-        objectRgn = ObjectRecognizer(thresholdedImage)
+        objectRgn = ObjectRecognizer(img, cfgAccessor=cfg)
         circleImg = objectRgn.find_and_draw_circles()
 
         if (DEBUG):
