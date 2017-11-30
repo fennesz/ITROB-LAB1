@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-
 import roshelper
 import rospy
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import Image as ImageMessage
 from camera_sensor.srv import *
+from opencvlibrary.cameracontroller import CameraController
 
 nodeName = "Camera" # Figure out how to set this from
                     # Arguments
@@ -28,19 +28,19 @@ class Camera(object):
     # ctor, start service
     def __init__(self): # (self, exp_a, exp_b, exp_c)
         self.__setup_services()
-        pass
+        self.cameraController = CameraController(qr_codes)
 
     # Publishes the raw image
-    @n.publisher(nodeName + "/raw_image", Image)
+    @n.publisher(nodeName + "/raw_image", ImageMessage)
     def publish_raw_image(self):
-        msg = Image()
+        msg = ImageMessage()
         # msg.data = self.raw_image
         return msg
     
     # Publishes the raw image
-    @n.publisher(nodeName + "/shapes", Image)
+    @n.publisher(nodeName + "/shapes", ImageMessage)
     def publish_shapes(self):
-        msg = Image()
+        msg = ImageMessage()
         # msg.data = self.shapes
         return msg
 

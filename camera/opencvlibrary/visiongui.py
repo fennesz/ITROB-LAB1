@@ -83,16 +83,15 @@ class VisionGui:
         return True
 
     def onIntervalChange(self, title):
-        value = self.app.getScale("webcamFPS") / 10000.0
-        if(value < 0.33): # 0-33% = 1-100
-            value = value * 100
-        elif(value < 0.66):# 33-66% = 100-1000
-            value = value * 1000
-        elif(value < 1.001):# 66-100% = 1000-10000
-            value = value * 10000
-
-        self.modifiedScaleValue = self.nearestToCurrentOrderOfMagnitude(value)
-        self.app.setLabel("webcamFPS", self.modifiedScaleValue)
+        value = t * 1.0
+        if (value < 3333):
+            value = ((100 / 3333) * value)
+        elif (value < 6666):
+            value = ((300 / 1111) * value) - 800
+        elif (value <= 10000):
+            value = ((4500 / 1667) * value) - (28330000 / 1667)
+            self.modifiedScaleValue = self.nearestToCurrentOrderOfMagnitude(value)
+            self.app.setLabel("webcamFPS", self.modifiedScaleValue)
         return
 
 
