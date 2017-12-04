@@ -1,12 +1,11 @@
 #!/usr/bin/env python
-import os
-import roshelper
 import sys
-from sensor_msgs.msg import Image as ImageMessage
-from camera_sensor.srv import *
-
+sys.path.append('src/ITROB-LAB1/camera/')
 from opencvlibrary.configaccess import ConfigAccessor
 from opencvlibrary.cameracontroller import CameraController
+import roshelper
+from sensor_msgs.msg import Image as ImageMessage
+from camera_sensor.srv import *
 
 nodeName = "Camera" # Figure out how to set this from
                     # Arguments
@@ -37,8 +36,8 @@ class Camera(object):
     @n.publisher(nodeName + "/shapes", ImageMessage)
     def publish_shapes(self):
         msg = ImageMessage()
-
-        # msg.data = self.shapes
+        self.currentShapes = self.cameraController.get_shapes(self.currentRawImage)
+        msg.data = self.currentShapes
         return msg
 
     # Private function that sets up the service handlers
@@ -51,7 +50,7 @@ class Camera(object):
     #def handle_get_qr_codes(self, req):
     #    return get_qr_codesResponse(self.qr_codes)
 
-    @n.main_loop(frequency=30)
+    @n.main_loop(frequency=0.1)
     def run(self):
         try:
             # self.update_image()
