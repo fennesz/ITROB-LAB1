@@ -1,10 +1,11 @@
 #!/usr/bin/env python
+import os
 import roshelper
-import rospy
+import sys
 from sensor_msgs.msg import Image as ImageMessage
 from camera_sensor.srv import *
 
-from library.servicelocator import ServiceLocator
+from opencvlibrary.configaccess import ConfigAccessor
 from opencvlibrary.cameracontroller import CameraController
 
 nodeName = "Camera" # Figure out how to set this from
@@ -20,19 +21,23 @@ class Camera(object):
     # ctor, start service
     def __init__(self): # (self, exp_a, exp_b, exp_c)
        # self.__setup_services()
-        self.cameraController = CameraController(ServiceLocator.get_config())
+        self.cfgAccess = ConfigAccessor('tenderbot')
+        self.cameraController = CameraController(self.cfgAccess)
 
     # Publishes the raw image
     @n.publisher(nodeName + "/raw_image", ImageMessage)
     def publish_raw_image(self):
         msg = ImageMessage()
-        # msg.data = self.raw_image
+        self.currentRawImage = self.cameraController.get_raw_webcam_image(fromFile=True)
+        msg.data = self.currentRawImage
+        print 'returning image'
         return msg
     
     # Publishes the raw image
     @n.publisher(nodeName + "/shapes", ImageMessage)
     def publish_shapes(self):
         msg = ImageMessage()
+
         # msg.data = self.shapes
         return msg
 
@@ -48,11 +53,19 @@ class Camera(object):
 
     @n.main_loop(frequency=30)
     def run(self):
-        # self.update_image()
-        # self.update_shapes()
-        # self.update_qr_codes()
-        self.publish_raw_image()
-        self.publish_shapes()
+        try:
+            # self.update_image()
+            # self.update_shapes()
+            # self.update_qr_codes()
+            self.publish_raw_image()
+            self.publish_shapes()
+        except:
+            self.cameraController.stop()
+            print "Unexpected error:", sys.exc_info()[0]
+            sys.exit(0)
+
+
+
 
 if __name__ == "__main__":
     n.start(spin=True)
