@@ -72,7 +72,11 @@ class ConfigAccessor:
             'minRadius': 0,
             'maxRadius': 120,
             'param1': 100,
-            'param2': 10
+            'param2': 10,
+            'dilatePixelsX': 3,
+            'dilatePixelsY': 3,
+            'closePixelsX': 5,
+            'closePixelsY': 5,
         }
 
     def __exit__(self):

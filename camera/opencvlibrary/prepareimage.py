@@ -16,9 +16,8 @@ class PrepareImage:
         self.reducedNoiseImage = self.reduce_picturenoise(self.image)
         self.imageGrey = image#self.greyscale(self.reducedNoiseImage)
 
-    @staticmethod
-    def greyscale(file):
-        return cv2.cvtColor(file,cv2.COLOR_BGR2GRAY) #turn image to grayscale ---> turn back to colour later
+    def greyscale(self):
+        return cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY, 0) #turn image to grayscale ---> turn back to colour later
 
     #reduce noise in picture
     def reduce_picturenoise(self, file):
@@ -32,8 +31,9 @@ class PrepareImage:
         combination of dilate and erode
         """
         ret,th1 = cv2.threshold(self.imageGrey, self.cfgAccessor.data['thresholdValue'],255,cv2.THRESH_BINARY)
-        resdi = cv2.dilate(th1,np.ones((3,3),np.uint8))
-        closing = cv2.morphologyEx(resdi, cv2.MORPH_CLOSE,np.ones((5,5),np.uint8))
+        #TODO: Read about two commands below:
+        resdi = cv2.dilate(th1,np.ones((self.cfgAccessor.data['dilatePixelsX'],self.cfgAccessor.data['dilatePixelsY']),np.uint8))
+        closing = cv2.morphologyEx(resdi, cv2.MORPH_CLOSE,np.ones((self.cfgAccessor.data['closePixelsX'],self.cfgAccessor.data['closePixelsY']),np.uint8))
         return closing
 
     #Colour information is present within the specified range
