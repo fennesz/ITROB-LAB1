@@ -1,1 +1,1 @@
-{"webcamFPS": 798.0, "minDistance": 20, "dp": 2.79, "isDebug": true, "configUpdateRate": 1, "closePixelsY": 5, "closePixelsX": 5, "dilatePixelsY": 3, "dilatePixelsX": 3, "param2": 73, "param1": 100, "exposure": 1, "maxRadius": 50, "thresholdValue": 242, "minRadius": 1}
+{"webcamFPS": 726.0, "param1": 381, "dp": 2.32, "dilatePixelsY": 3, "configUpdateRate": 1, "closePixelsY": 5, "closePixelsX": 5, "isDebug": true, "dilatePixelsX": 3, "circleColor": "red", "param2": 44, "minDistance": 59, "minRadius": 3, "maxRadius": 61, "thresholdValue": 139, "exposure": 1}

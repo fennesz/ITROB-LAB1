@@ -1,4 +1,3 @@
-import sys
 import math
 
 from appJar import gui
@@ -86,11 +85,28 @@ class VisionGui:
         self.app.setScaleRange("closePixels", 1, 20, self.paramclosePixelsValueDefault)
         self.app.showScaleValue("closePixels", show=True)
 
+        self.app.addLabel("colors", "Color of circle:", 15, 0)
+        self.paramColorsValue = self.app.addOptionBox("colors", ["all", "green", "blue",
+                                          "yellow", "red"], 15, 1, self.getColorIndex(self.paramColorsValueDefault))
+        self.app.setOptionBox("colors", index=self.getColorIndex(self.paramColorsValueDefault), callFunction=False)
+
         self.app.addButton("Save", func=self.saveValues)
 
     def onExit(self):
         self.cfg.stopFlag.set()
         return True
+
+    def getColorIndex(self, color):
+        if color == 'all':
+            return 0
+        if color == 'green':
+            return 1
+        if color == 'blue':
+            return 2
+        if color == 'yellow':
+            return 3
+        if color == 'red':
+            return 4
 
     def onIntervalChange(self, title):
         value = t * 1.0
@@ -129,6 +145,7 @@ class VisionGui:
         self.paramminDistanceValueDefault = cfg.data['minDistance']
         self.paramdilatePixelsValueDefault = cfg.data['dilatePixelsX']
         self.paramclosePixelsValueDefault = cfg.data['closePixelsX']
+        self.paramColorsValueDefault = cfg.data['circleColor']
         self.cfg.stopFlag.set()
 
     def saveValues(self, arg):
@@ -147,6 +164,7 @@ class VisionGui:
         cfg.setValue('closePixelsY', self.paramclosePixelsValue.get())
         cfg.setValue('dilatePixelsX', self.paramDilatePixelsValue.get())
         cfg.setValue('dilatePixelsY', self.paramDilatePixelsValue.get())
+        cfg.setValue('circleColor', self.app.getOptionBox("colors"))
 
 
 

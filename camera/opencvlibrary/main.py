@@ -20,26 +20,24 @@ while True:
         DEBUG = cfg.data['isDebug']
         FPS = float(cfg.data['webcamFPS'])
         if (len(sys.argv) < 2):
-            img = imgrtriever.get_from_file('testimages/full_light_many_circles_many_colors.jpg')
+            img = imgrtriever.get_from_file('testimages/full_light_many_shapes.jpg')
             #img = imgrtriever.get_from_webcam("http://nano.pse.umass.edu:81/axis-cgi/jpg/image.cgi?resolution=640x480", cfg.data['exposure'])
         else:
             img = imgrtriever.get_from_file(sys.argv[1])
         imgPreparer = PrepareImage(image=img, cfgAccessor=cfg)
-        lower_blue = np.array([100,50,50])
-        upper_blue = np.array([130,255,255])
         #TODO: Extract single color range, to create pseudo-8bit config
-        single_channelImg = imgPreparer.extract_single_color_range(lower_blue, upper_blue)
-        greyImg = imgPreparer.greyscale()
-        #Debugger.show_image(greyImg, FPS)
-        treshholded_img = imgPreparer.threshold_image(greyImg)
+        single_channelImg = imgPreparer.extract_single_color_range(color=cfg.data['circleColor'])
+        greyImg = imgPreparer.greyscale(single_channelImg)
+        treshholded_img = imgPreparer.threshold_image(image=greyImg)
         objectRgn = ObjectRecognizer(treshholded_img, cfgAccessor=cfg)
         circles = objectRgn.find_circles(treshholded_img);
         if (circles is not None):
             objectRgn.draw_circles(circles, img)
         circleImg = objectRgn.find_and_draw_circles()
         if (DEBUG):
-            Debugger.show_image(img, FPS, "Debug_Color")
+            Debugger.show_image(single_channelImg, FPS, "Debug_SingleChannel")
             Debugger.show_image(circleImg, FPS, "Debug_Treshold")
+            Debugger.show_image(img, FPS, "Debug_Color")
     except Exception as ex:
         ConfigAccessor.stopFlag.set()
         raise

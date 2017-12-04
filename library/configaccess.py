@@ -1,8 +1,6 @@
 import json
-import numpy as np
 import os
 from threading import Thread,Event
-
 
 class RecurringConfigReader(Thread):
     configUpdateRate = 5
@@ -79,7 +77,6 @@ class ConfigAccessor:
             'dilatePixelsY': 3,
             'closePixelsX': 5,
             'closePixelsY': 5,
-            'circleColor': 'all'
         }
 
     def __exit__(self):

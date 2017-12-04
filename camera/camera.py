@@ -3,6 +3,8 @@ import roshelper
 import rospy
 from sensor_msgs.msg import Image as ImageMessage
 from camera_sensor.srv import *
+
+from library.servicelocator import ServiceLocator
 from opencvlibrary.cameracontroller import CameraController
 
 nodeName = "Camera" # Figure out how to set this from
@@ -15,16 +17,10 @@ n = roshelper.Node(nodeName, anonymous=False)
 class Camera(object):
     get_qr_codes_service = None
     
-    # Current raw image
-    raw_image = None
-    
-    # Current shapes
-    shapes = None
-    
     # ctor, start service
     def __init__(self): # (self, exp_a, exp_b, exp_c)
-        self.__setup_services()
-        self.cameraController = CameraController()
+       # self.__setup_services()
+        self.cameraController = CameraController(ServiceLocator.get_config())
 
     # Publishes the raw image
     @n.publisher(nodeName + "/raw_image", ImageMessage)
@@ -41,14 +37,14 @@ class Camera(object):
         return msg
 
     # Private function that sets up the service handlers
-    def __setup_services(self):
-        self.get_qr_codes_service = rospy.Service(nodeName + '/get_qr_codes',     # Name of service
-                                                  self.qr_codes,                # Service to implement
-                                                  self.handle_get_qr_codes)       # Handler for service
+   # def __setup_services(self):
+   #     self.get_qr_codes_service = rospy.Service(nodeName + '/get_qr_codes',     # Name of service
+    #                                              self.qr_codes,                # Service to implement
+     #                                             self.handle_get_qr_codes)       # Handler for service
 
     # function that handles requests to the position service
-    def handle_get_qr_codes(self, req):
-        return get_qr_codesResponse(self.qr_codes)
+    #def handle_get_qr_codes(self, req):
+    #    return get_qr_codesResponse(self.qr_codes)
 
     @n.main_loop(frequency=30)
     def run(self):

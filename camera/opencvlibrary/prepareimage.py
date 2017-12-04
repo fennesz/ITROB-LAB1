@@ -9,44 +9,67 @@ from retrieveImage import RetrieveImage
 
 
 class PrepareImage:
+    lower_blue = np.array([100, 50, 50])
+    upper_blue = np.array([130, 255, 255])
+    lower_green = np.array([35, 50, 50])
+    upper_green = np.array([90, 255, 255])
+
+    lower_yellow = np.array([20, 50, 50])
+    upper_yellow = np.array([30, 255, 255])
+
+    lower_red = np.array([0, 50, 50])
+    upper_red = np.array([20, 255, 255])
 
     def __init__(self, image, cfgAccessor): #Constructor
         self.cfgAccessor = cfgAccessor
         self.image = image
         self.reducedNoiseImage = self.reduce_picturenoise(self.image)
-        self.imageGrey = image#self.greyscale(self.reducedNoiseImage)
 
-    def greyscale(self):
-        return cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY, 0) #turn image to grayscale ---> turn back to colour later
+    def greyscale(self, image=None):
+        if image is None:
+            image = self.image
+        return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY, 0) #turn image to grayscale ---> turn back to colour later
 
     #reduce noise in picture
     def reduce_picturenoise(self, file):
         return cv2.medianBlur(file,5)
 
     #fill small holes and close "blobs"
-    def threshold_image(self,debug=False):
+    def threshold_image(self, debug=False, image=None):
         """
         Thresholds the image within the desired range and then dilates with a 3x3 matrix
         such that small holes are filled. Afterwards the 'blobs' are closed using a
         combination of dilate and erode
         """
-        ret,th1 = cv2.threshold(self.imageGrey, self.cfgAccessor.data['thresholdValue'],255,cv2.THRESH_BINARY)
+        if (image is None):
+            image = self.image
+        ret,th1 = cv2.threshold(image, self.cfgAccessor.data['thresholdValue'],255,cv2.THRESH_BINARY)
         #TODO: Read about two commands below:
         resdi = cv2.dilate(th1,np.ones((self.cfgAccessor.data['dilatePixelsX'],self.cfgAccessor.data['dilatePixelsY']),np.uint8))
         closing = cv2.morphologyEx(resdi, cv2.MORPH_CLOSE,np.ones((self.cfgAccessor.data['closePixelsX'],self.cfgAccessor.data['closePixelsY']),np.uint8))
         return closing
 
     #Colour information is present within the specified range
-    def extract_single_color_range(self,lower,upper):
-        """
-        Calculates a mask for which all pixels within the specified range is set to 1
-        the ands this mask with the provided image such that color information is
-        still present, but only for the specified range
-        """
+    def extract_single_color_range(self,lower=None,upper=None, color=None):
+        if color is not None:
+            upper, lower = self.__get_color(color)
         self.hsv = cv2.cvtColor(self.image, cv2.COLOR_BGR2HSV)
         mask = cv2.inRange(self.hsv, lower, upper)
-        res = cv2.bitwise_and(self.image,self.image, mask= mask)
-        return res
+        self.singleColorImage = cv2.bitwise_and(self.image,self.image, mask=mask)
+        return self.singleColorImage
+
+    def __get_color(self, color):
+        if color == 'red':
+            return self.upper_red, self.lower_red
+        if color == 'blue':
+            return self.upper_blue, self.lower_blue
+        if color == 'green':
+            return self.upper_green, self.lower_green
+        if color == 'yellow':
+            return self.upper_yellow, self.lower_yellow
+        if color == 'all':
+            return np.array([255, 255, 255]), np.array([0,0,0])
+        raise Exception("Invalid color. Choose red, green, yellow or blue")
 
 
 if __name__ == '__main__':
