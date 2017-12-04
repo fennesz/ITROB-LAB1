@@ -13,7 +13,6 @@ n = roshelper.Node(nodeName, anonymous=False)
 # A class for the camera, requires image getting code
 @n.entry_point()
 class Camera(object):
-    get_qr_codes = None
     get_qr_codes_service = None
     
     # Current raw image
@@ -22,13 +21,10 @@ class Camera(object):
     # Current shapes
     shapes = None
     
-    # Current QRCodes
-    qr_codes = ["0", "1"]
-    
     # ctor, start service
     def __init__(self): # (self, exp_a, exp_b, exp_c)
         self.__setup_services()
-        self.cameraController = CameraController(qr_codes)
+        self.cameraController = CameraController()
 
     # Publishes the raw image
     @n.publisher(nodeName + "/raw_image", ImageMessage)
@@ -47,7 +43,7 @@ class Camera(object):
     # Private function that sets up the service handlers
     def __setup_services(self):
         self.get_qr_codes_service = rospy.Service(nodeName + '/get_qr_codes',     # Name of service
-                                                  get_qr_codes,                   # Service to implement
+                                                  self.qr_codes,                # Service to implement
                                                   self.handle_get_qr_codes)       # Handler for service
 
     # function that handles requests to the position service
