@@ -13,7 +13,7 @@ class RetrieveImage:
 
     def get_from_file(self, filename):
 		print "Loading from file..."
-		file = cv2.imread(filename, 0)
+		file = cv2.imread(filename, 1)
 		if file is not None:
 			print "Succesfully loaded file"
 			return file

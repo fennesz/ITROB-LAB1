@@ -13,7 +13,7 @@ class VisionGui:
         self.app = gui()
         self.app.setFont(10)
 
-        self.app.setGeometry("500x500") #Size of window
+        self.app.setGeometry("500x700") #Size of window
         self.app.addLabel("title", "'tenderBot configurator", row=0, colspan=2)
         self.app.addHorizontalSeparator(colspan=2, row=1)
         self.app.addLabel("exposure", "Exposure: ", 2, 0)
@@ -58,7 +58,7 @@ class VisionGui:
 
         self.app.addLabel("maxRadius", "Circle maxRadius:", 9, 0)
         self.maxRadiusValue = self.app.addScale("maxRadius", 9, 1)
-        self.app.setScaleRange("maxRadius", 50, 150, self.maxRadiusValueDefault)
+        self.app.setScaleRange("maxRadius", 20, 150, self.maxRadiusValueDefault)
         self.app.showScaleValue("maxRadius", show=True)
 
         self.app.addLabel("param1", "Circle param1:", 10, 0)
@@ -75,6 +75,16 @@ class VisionGui:
         self.paramMinDistanceValue = self.app.addScale("minDistance", 12, 1)
         self.app.setScaleRange("minDistance", 1, 500, self.paramminDistanceValueDefault)
         self.app.showScaleValue("minDistance", show=True)
+
+        self.app.addLabel("dilatePixels", "Dilate Pixels treshold:", 13, 0)
+        self.paramDilatePixelsValue = self.app.addScale("dilatePixels", 13, 1)
+        self.app.setScaleRange("dilatePixels", 1, 20, self.paramdilatePixelsValueDefault)
+        self.app.showScaleValue("dilatePixels", show=True)
+
+        self.app.addLabel("closePixels", "Close Pixels treshold:", 14, 0)
+        self.paramclosePixelsValue = self.app.addScale("closePixels", 14, 1)
+        self.app.setScaleRange("closePixels", 1, 20, self.paramclosePixelsValueDefault)
+        self.app.showScaleValue("closePixels", show=True)
 
         self.app.addButton("Save", func=self.saveValues)
 
@@ -117,6 +127,8 @@ class VisionGui:
         self.paramOneValueDefault = cfg.data['param1']
         self.paramTwoValueDefault = cfg.data['param2']
         self.paramminDistanceValueDefault = cfg.data['minDistance']
+        self.paramdilatePixelsValueDefault = cfg.data['dilatePixelsX']
+        self.paramclosePixelsValueDefault = cfg.data['closePixelsX']
         self.cfg.stopFlag.set()
 
     def saveValues(self, arg):
@@ -131,6 +143,12 @@ class VisionGui:
         cfg.setValue('param1', self.paramOneValue.get())
         cfg.setValue('param2', self.paramTwoValue.get())
         cfg.setValue('minDistance', self.paramMinDistanceValue.get())
+        cfg.setValue('closePixelsX', self.paramclosePixelsValue.get())
+        cfg.setValue('closePixelsY', self.paramclosePixelsValue.get())
+        cfg.setValue('dilatePixelsX', self.paramDilatePixelsValue.get())
+        cfg.setValue('dilatePixelsY', self.paramDilatePixelsValue.get())
+
+
 
 if __name__ == '__main__':
     cfg = ConfigAccessor('tenderbot')
