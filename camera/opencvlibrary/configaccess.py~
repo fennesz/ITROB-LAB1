@@ -37,7 +37,6 @@ class ConfigAccessor:
         if location == 'catkin':
             configName = '../../../../' + configName
         self.configName = configName + ".json"
-        print "Config path: " + self.configName
         try:       
             self.reader = FileReader(self.configName)
         except OSError:

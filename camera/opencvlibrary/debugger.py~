@@ -17,4 +17,5 @@ class Debugger:
                 fps = 500 / Debugger.images_showing
             key = cv2.waitKey(int(fps))
             if key is not -1:
+                ConfigAccessor.stopFlag.set()
                 exit(0)

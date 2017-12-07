@@ -27,7 +27,7 @@ class CameraController:
         if Debug:
             lol = objectRgn.draw_circles(circles=circles, image=image)
             Debugger.show_image(lol, fps=self.cfgAccess.data['webcamFPS'])
-            Debugger.show_image(treshholded_img, fps=self.cfgAccess.data['webcamFPS'], name="DebugTreshold")
+            Debugger.show_image(treshholded_img, ps=self.cfgAccess.data['webcamFPS'], name="DebugTreshold")
         return circles
 
     def stop(self):

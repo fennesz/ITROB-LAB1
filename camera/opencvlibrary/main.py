@@ -10,6 +10,7 @@ import sys
 CONFIG_FILENAME = 'tenderbot'
 
 cfg = ConfigAccessor(CONFIG_FILENAME)
+cfg.start_reading()
 
 '''DEBUG VALUES'''
 DEBUG = True
@@ -39,6 +40,6 @@ while True:
             Debugger.show_image(circleImg, FPS, "Debug_Treshold")
             Debugger.show_image(img, FPS, "Debug_Color")
     except Exception as ex:
-        ConfigAccessor.stopFlag.set()
+        cfg.stop_reading()
         raise
         sys.exit(0)

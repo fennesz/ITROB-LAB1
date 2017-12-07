@@ -177,8 +177,7 @@ if __name__ == '__main__':
 	    if sys.argv[1] == "ros":
 	        cfg = ConfigAccessor('tenderbot', location='catkin')
 	        del sys.argv[1]
-        else:
-            cfg = ConfigAccessor('tenderbot')
+        cfg = ConfigAccessor('tenderbot')
         cfg.start_reading()
         vsgui = VisionGui(cfg)
         vsgui.execute()

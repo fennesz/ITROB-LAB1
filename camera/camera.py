@@ -50,18 +50,14 @@ class Camera(object):
     #def handle_get_qr_codes(self, req):
     #    return get_qr_codesResponse(self.qr_codes)
 
-    @n.main_loop(frequency=0.1)
+    @n.main_loop(frequency=5)
     def run(self):
-        try:
-            # self.update_image()
-            # self.update_shapes()
-            # self.update_qr_codes()
-            self.publish_raw_image()
-            self.publish_shapes()
-        except:
-            self.cameraController.stop()
-            print "Unexpected error:", sys.exc_info()[0]
-            sys.exit(0)
+        print "camera.py: Main loop executed"
+        # self.update_image()
+        # self.update_shapes()
+        # self.update_qr_codes()
+        self.publish_raw_image()
+        self.publish_shapes()
 
 
 
