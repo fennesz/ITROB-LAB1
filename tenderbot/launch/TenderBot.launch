@@ -1,0 +1,9 @@
+<launch>
+	<group ns="TenderBot">
+		<!-- TenderBots arm requires launching multiple nodes-->
+		<include file="$(find tenderbot_arm)/launch/TenderBotArm.launch"/>
+	    <node name="Vision" pkg="tenderbot_vision" type="tenderbot_vision.py"/>
+	    <node name="Input" pkg="tenderbot_input" type="tenderbot_input.py"/>
+	    <node name="Logic" pkg="tenderbot_logic" type="tenderbot_logic.py"/>
+	</group>
+</launch>
