@@ -21,8 +21,8 @@ while True:
         DEBUG = cfg.data['isDebug']
         FPS = float(cfg.data['webcamFPS'])
         if (len(sys.argv) < 2):
-            img = imgrtriever.get_from_file('testimages/full_light_many_shapes.jpg')
-            #img = imgrtriever.get_from_webcam("http://nano.pse.umass.edu:81/axis-cgi/jpg/image.cgi?resolution=640x480", cfg.data['exposure'])
+            #img = imgrtriever.get_from_file('testimages/full_light_many_shapes.jpg')
+            img = imgrtriever.get_from_webcam(takes=cfg.data['exposure'])
         else:
             img = imgrtriever.get_from_file(sys.argv[1])
         imgPreparer = PrepareImage(image=img, cfgAccessor=cfg)

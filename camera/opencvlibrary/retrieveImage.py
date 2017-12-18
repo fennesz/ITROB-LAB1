@@ -21,7 +21,7 @@ class RetrieveImage:
 			print "Couldn't find file: " + filename
 			raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), filename)
 
-    def get_from_webcam(self, url, takes = 1):
+    def get_from_webcam(self, url='http://192.168.20/image/jpeg.cgi', takes = 1):
         print "try fetch from webcam..."
         img = ''
         while takes > 0:
@@ -34,7 +34,7 @@ class RetrieveImage:
             if a != -1 and b != -1:
                 jpg = bytes[a:b+2]
                 bytes= bytes[b+2:]
-                tmp = cv2.imdecode(np.fromstring(jpg, dtype=np.uint8),cv2.CV_LOAD_IMAGE_GRAYSCALE)
+                tmp = cv2.imdecode(np.fromstring(jpg, dtype=np.uint8),cv2.CV_LOAD_IMAGE_COLOR)
             else:
                 raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), "Try increasing buffersize")
             if img is not '':

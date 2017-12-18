@@ -35,7 +35,7 @@ class ConfigAccessor:
 
     def __init__(self, configName, location=''):
         if location == 'catkin':
-            configName = '../../../../' + configName
+            configName = '/home/ubuntu/catkin_ws/' + configName
         self.configName = configName + ".json"
         print "Config path: " + self.configName
         try:       
