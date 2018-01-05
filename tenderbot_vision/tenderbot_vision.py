@@ -1,60 +1,48 @@
 #!/usr/bin/env python
-
+import sys
+sys.path.append('src/ITROB-LAB1/tenderbot_vision/')
+from opencvlibrary.configaccess import ConfigAccessor
+from opencvlibrary.cameracontroller import CameraController
 import roshelper
-import rospy
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import Image as ImageMessage
 from camera_sensor.srv import *
 
-node_name = "Vision"
+nodeName = "Vision" # Figure out how to set this from
+                    # Arguments
 
-n = roshelper.Node(node_name, anonymous=False)
+n = roshelper.Node(nodeName, anonymous=False)
 
 # A class for the camera, requires image getting code
 @n.entry_point()
 class TenderBotVision(object):
-    get_qr_codes = None
     get_qr_codes_service = None
-    
-    # Current raw image
-    raw_image = None
-    
-    # Current shapes
-    shapes = None
-    
-    # Current QRCodes
-    qr_codes = ["0", "1"]
     
     # ctor, start service
     def __init__(self): # (self, exp_a, exp_b, exp_c)
-        self.__setup_services()
-        pass
+       # self.__setup_services()
+        self.cfgAccess = ConfigAccessor('tenderbot')
+        self.cameraController = CameraController(self.cfgAccess)
 
     # Publishes the raw image
-    @n.publisher(node_name + "/raw_image", Image)
+    @n.publisher(nodeName + "/raw_image", ImageMessage)
     def publish_raw_image(self):
-        msg = Image()
-        # msg.data = self.raw_image
+        msg = ImageMessage()
+        self.currentRawImage = self.cameraController.get_raw_webcam_image(fromFile=False)
+        msg.data = self.currentRawImage
+        print 'returning image'
         return msg
     
     # Publishes the raw image
-    @n.publisher(node_name + "/shapes", Image)
+    @n.publisher(nodeName + "/shapes", ImageMessage)
     def publish_shapes(self):
-        msg = Image()
-        # msg.data = self.shapes
+        msg = ImageMessage()
+        self.currentShapes = self.cameraController.get_shapes(self.currentRawImage)
+        msg.data = self.currentShapes
         return msg
 
-    # Private function that sets up the service handlers
-    def __setup_services(self):
-        self.get_qr_codes_service = rospy.Service(node_name + '/get_qr_codes',     # Name of service
-                                                  get_qr_codes,                   # Service to implement
-                                                  self.handle_get_qr_codes)       # Handler for service
-
-    # function that handles requests to the position service
-    def handle_get_qr_codes(self, req):
-        return get_qr_codesResponse(self.qr_codes)
-
-    @n.main_loop(frequency=30)
+    @n.main_loop(frequency=5)
     def run(self):
+        print "camera.py: Main loop executed"
         # self.update_image()
         # self.update_shapes()
         # self.update_qr_codes()
