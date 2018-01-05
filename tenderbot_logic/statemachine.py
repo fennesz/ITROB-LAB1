@@ -24,15 +24,12 @@ class TenderBotStateMachine(object):
                     {'trigger': 'stop', 'source': 'idle', 'dest': 'done'}
                   ]
     machine = None
-    currentTask = lambda self: self.derp();
-    
-    def derp(self):
-        print(self.drinkchoice)
-    
+    currentTask = None
+
     def update(self):
         if self.currentTask is not None:
             self.currentTask()
-    
+ 
     def __init__(self):
         self.machine = Machine(model=self, states=self.states, transitions=self.transitions, initial='initial', queued=True)
     
