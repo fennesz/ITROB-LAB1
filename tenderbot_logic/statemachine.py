@@ -4,6 +4,8 @@ from transitions import Machine, State, Transition
 # github.com/pytransitions/transitions
 
 class TenderBotStateMachine(object):
+    drinkchoice = 0
+    
     states = [
                State(name='initial'),
                State(name='calibration', on_enter='enter_calibration', on_exit="exit_calibration"),
@@ -22,8 +24,10 @@ class TenderBotStateMachine(object):
                     {'trigger': 'stop', 'source': 'idle', 'dest': 'done'}
                   ]
     machine = None
-    currentTask = None;
+    currentTask = lambda self: self.derp();
     
+    def derp(self):
+        print(self.drinkchoice)
     
     def update(self):
         if self.currentTask is not None:
