@@ -12,7 +12,7 @@ class CameraController:
     def get_raw_webcam_image(self, url='http://192.168.20/image/jpeg.cgi', fromFile=False):
         imgRetr = RetrieveImage()
         if fromFile:
-            return imgRetr.get_from_file('src/ITROB-LAB1/camera/opencvlibrary/testimages/full_light_many_shapes.jpg')
+            return imgRetr.get_from_file('/home/ubuntu/catkin_ws/src/ITROB-LAB1/tenderbot_vision/opencvlibrary/testimages/full_light_many_shapes.jpg')
         try:
             image = imgRetr.get_from_webcam(url, takes=self.cfgAccess.data['exposure'])
         except IOError:
