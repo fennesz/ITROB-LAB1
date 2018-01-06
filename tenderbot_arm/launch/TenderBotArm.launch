@@ -1,0 +1,6 @@
+<launch>
+	<node name="Arm" pkg="tenderbot_arm" type="tenderbot_arm.py">
+		<rosparam>
+        </rosparam>
+	</node>
+</launch>
