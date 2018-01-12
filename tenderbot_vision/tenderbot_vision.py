@@ -27,7 +27,7 @@ class TenderBotVision(object):
     @n.publisher(nodeName + "/raw_image", ImageMessage)
     def publish_raw_image(self):
         msg = ImageMessage()
-        self.currentRawImage = self.cameraController.get_raw_webcam_image(fromFile=True)
+        self.currentRawImage = self.cameraController.get_raw_webcam_image()
         msg.data = self.currentRawImage
         print 'returning image'
         return msg
