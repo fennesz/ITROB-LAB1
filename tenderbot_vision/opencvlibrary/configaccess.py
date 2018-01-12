@@ -83,6 +83,14 @@ class ConfigAccessor:
             'dilatePixelsY': 3,
             'closePixelsX': 5,
             'closePixelsY': 5,
+            'lowBlue1' : 100,
+            'upBlue1' : 130,
+            'lowGreen1': 35,
+            'upGreen1': 20,
+            'lowYel1': 30,
+            'upYel1': 130,
+            'lowRed1': 0,
+            'upRed1': 20,
             'circleColor': 'all'
         }
 
