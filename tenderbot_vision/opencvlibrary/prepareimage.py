@@ -14,26 +14,18 @@ class PrepareImage:
     # BLUE
     #lower_blue = np.array([100, 50, 50])
     #upper_blue = np.array([130, 255, 255])
-    lower_blue = np.array([100, 50, 50])
-    upper_blue = np.array([130, 255, 255])
 
     # GREEN
     #lower_green = np.array([35, 50, 50])
     #upper_green = np.array([90, 255, 255])
-    lower_green = np.array([35, 50, 50])
-    upper_green = np.array([90, 255, 255])
 
     # YELLOW
     #lower_yellow = np.array([20, 50, 50])
     #upper_yellow = np.array([30, 255, 255])
-    lower_yellow = np.array([20, 50, 50])
-    upper_yellow = np.array([30, 255, 255])
 
     # RED
     #lower_red = np.array([0, 50, 50])
     #upper_red = np.array([20, 255, 255])
-    lower_red = np.array([0, 50, 50])
-    upper_red = np.array([20, 255, 255])
 
     def __init__(self, image, cfgAccessor): #Constructor
         self.cfgAccessor = cfgAccessor
@@ -55,7 +47,7 @@ class PrepareImage:
         Thresholds the image within the desired range and then dilates with a 3x3 matrix
         such that small holes are filled. Afterwards the 'blobs' are closed using a
         combination of dilate and erode
-        """
+        """        
         if (image is None):
             image = self.image
         ret,th1 = cv2.threshold(image, self.cfgAccessor.data['thresholdValue'],255,cv2.THRESH_BINARY)
@@ -74,6 +66,14 @@ class PrepareImage:
         return self.singleColorImage
 
     def __get_color(self, color):
+        self.lower_blue = np.array([self.cfgAccessor.data['lowBlue1'], 50, 50])
+        self.upper_blue = np.array([self.cfgAccessor.data['upBlue1'], 255, 255])
+        self.lower_green = np.array([self.cfgAccessor.data['lowGreen1'], 50, 50])
+        self.upper_green = np.array([self.cfgAccessor.data['upGreen1'], 255, 255])
+        self.lower_yellow = np.array([self.cfgAccessor.data['lowYel1'], 50, 50])
+        self.upper_yellow = np.array([self.cfgAccessor.data['upYel1'], 255, 255])
+        self.lower_red = np.array([self.cfgAccessor.data['lowRed1'], 50, 50])
+        self.upper_red = np.array([self.cfgAccessor.data['upRed1'], 255, 255])        
         if color == 'red':
             return self.upper_red, self.lower_red
         if color == 'blue':

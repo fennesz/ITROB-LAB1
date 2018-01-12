@@ -23,7 +23,6 @@ class VisionGui:
         self.app.setScaleRange("exposure", 1, 7, self.exposureValueDefault)
         self.app.showScaleIntervals("exposure", 1)
 
-
         self.app.addHorizontalSeparator(colspan=3, row=3)
 
         self.app.addLabel("configUpdateRate", "ConfigUpdateInterval (Reads per second): ", 3, 0)
@@ -91,42 +90,42 @@ class VisionGui:
 
         self.app.addLabel("lowBlue1", "Lower Blue param1:", 3, 2)
         self.paramlowBlue1Value = self.app.addScale("lowBlue1", 3, 3)
-        self.app.setScaleRange("lowBlue1", 1, 100, self.paramlowBlue1ValueDefault)
+        self.app.setScaleRange("lowBlue1", 1, 255, self.paramlowBlue1ValueDefault)
         self.app.showScaleValue("lowBlue1", show=True)
 
         self.app.addLabel("upBlue1", "Upper Blue param1:", 4, 2)
-        self.paramclosePixelsValue = self.app.addScale("upBlue1", 4, 3)
-        self.app.setScaleRange("upBlue1", 1, 200, self.paramupBlue1ValueDefault)
+        self.paramupBlue1Value = self.app.addScale("upBlue1", 4, 3)
+        self.app.setScaleRange("upBlue1", 1, 255, self.paramupBlue1ValueDefault)
         self.app.showScaleValue("upBlue1", show=True)
 
         self.app.addLabel("lowGreen1", "Lower Green param1:", 5, 2)
         self.paramlowGreen1Value = self.app.addScale("lowGreen1", 5, 3)
-        self.app.setScaleRange("lowGreen1", 1, 50, self.paramlowGreen1ValueDefault)
+        self.app.setScaleRange("lowGreen1", 1, 255, self.paramlowGreen1ValueDefault)
         self.app.showScaleValue("lowGreen1", show=True)
 
         self.app.addLabel("upGreen1", "Upper Green param1:", 6, 2)
         self.paramupGreen1Value = self.app.addScale("upGreen1", 6, 3)
-        self.app.setScaleRange("upGreen1", 1, 100, self.paramupGreen1ValueDefault)
+        self.app.setScaleRange("upGreen1", 1, 255, self.paramupGreen1ValueDefault)
         self.app.showScaleValue("upGreen1", show=True)
 
         self.app.addLabel("lowYel1", "Lower Yellow param1:", 7, 2)
         self.paramlowYel1Value = self.app.addScale("lowYel1", 7, 3)
-        self.app.setScaleRange("lowYel1", 1, 50, self.paramlowYel1ValueDefault)
+        self.app.setScaleRange("lowYel1", 1, 255, self.paramlowYel1ValueDefault)
         self.app.showScaleValue("lowYel1", show=True)
 
         self.app.addLabel("upYel1", "Upper Yellow param1:", 8, 2)
         self.paramupYel1Value = self.app.addScale("upYel1", 8, 3)
-        self.app.setScaleRange("upYel1", 1, 50, self.paramupYel1ValueDefault)
+        self.app.setScaleRange("upYel1", 1, 255, self.paramupYel1ValueDefault)
         self.app.showScaleValue("upYel1", show=True)
 
         self.app.addLabel("lowRed1", "Lower Red param1:", 9, 2)
         self.paramlowRed1Value = self.app.addScale("lowRed1", 9, 3)
-        self.app.setScaleRange("lowRed1", 1, 50, self.paramlowRed1ValueDefault)
+        self.app.setScaleRange("lowRed1", 1, 255, self.paramlowRed1ValueDefault)
         self.app.showScaleValue("lowRed1", show=True)
 
         self.app.addLabel("upRed1", "Upper Red param1:", 10, 2)
         self.paramupRed1Value = self.app.addScale("upRed1", 10, 3)
-        self.app.setScaleRange("upRed1", 1, 50, self.paramupRed1ValueDefault)
+        self.app.setScaleRange("upRed1", 1, 255, self.paramupRed1ValueDefault)
         self.app.showScaleValue("upRed1", show=True)
 
         self.app.addLabel("colors", "Color of circle:", 11, 2)
