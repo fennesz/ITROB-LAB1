@@ -20,7 +20,7 @@ class TenderBotVision(object):
     # ctor, start service
     def __init__(self): # (self, exp_a, exp_b, exp_c)
        # self.__setup_services()
-        self.cfgAccess = ConfigAccessor('tenderbot')
+        self.cfgAccess = ConfigAccessor(configName='tenderbot', location='catkin')
         self.cameraController = CameraController(self.cfgAccess)
 
     # Publishes the raw image
