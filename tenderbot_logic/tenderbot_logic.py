@@ -14,8 +14,7 @@ n = roshelper.Node(node_name, anonymous=False)
 # A class for TenderBot business logic
 @n.entry_point()
 class TenderBotLogic(object):
-    implementation = None
-    
+    implementation = None    
     
     @n.subscriber(rospy.get_namespace() + "Input/DrinkChoice", Int32)
     def drink_choice(self, choice):

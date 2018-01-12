@@ -7,7 +7,7 @@ class TenderBotStateMachine(object):
     drinkchoice = 0
     
     states = [
-               State(name='initial'),
+               State(name='initial', on_enter='enter_initial'),
                State(name='calibration', on_enter='enter_calibration', on_exit="exit_calibration"),
                State(name='idle', on_enter='enter_idle'),
                State(name='mix_drink', on_enter='enter_mix_drink'),
@@ -33,21 +33,34 @@ class TenderBotStateMachine(object):
     def __init__(self):
         self.machine = Machine(model=self, states=self.states, transitions=self.transitions, initial='initial', queued=True)
     
+    def enter_initial(self):
+        self.currentTask = None
+        #Subscribe to input topic
+        #Subscribe to shape
+        #Subscribe to arm
+        self.start()
+
     def enter_calibration(self):
+        self.currentTask = None
         print "enter_calibration"
+        #Perform calibration routine
         self.calibration_completed()
         
     def exit_calibration(self):
         print "exit_calibration"
         
     def enter_idle(self):
+        self.currentTask = None
         print "enter_idle"
         
     def enter_error(self):
+        self.currentTask = None
         print "enter_error"
         
     def enter_mix_drink(self):
+        self.currentTask = None
         print "enter_mix_drink"
         
     def enter_done(self):
+        self.currentTask = None
         print "enter_done"
