@@ -7,16 +7,31 @@ from configaccess import ConfigAccessor
 from debugger import Debugger
 from retrieveImage import RetrieveImage
 
+# minDist=self.cfgAccessor.data['minDistance']
+
 
 class PrepareImage:
+    # BLUE
+    #lower_blue = np.array([100, 50, 50])
+    #upper_blue = np.array([130, 255, 255])
     lower_blue = np.array([100, 50, 50])
     upper_blue = np.array([130, 255, 255])
+
+    # GREEN
+    #lower_green = np.array([35, 50, 50])
+    #upper_green = np.array([90, 255, 255])
     lower_green = np.array([35, 50, 50])
     upper_green = np.array([90, 255, 255])
 
+    # YELLOW
+    #lower_yellow = np.array([20, 50, 50])
+    #upper_yellow = np.array([30, 255, 255])
     lower_yellow = np.array([20, 50, 50])
     upper_yellow = np.array([30, 255, 255])
 
+    # RED
+    #lower_red = np.array([0, 50, 50])
+    #upper_red = np.array([20, 255, 255])
     lower_red = np.array([0, 50, 50])
     upper_red = np.array([20, 255, 255])
 

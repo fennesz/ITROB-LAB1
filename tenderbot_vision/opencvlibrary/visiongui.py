@@ -14,7 +14,7 @@ class VisionGui:
         self.app = gui()
         self.app.setFont(10)
 
-        self.app.setGeometry("500x700") #Size of window
+        self.app.setGeometry("500x1000") #Size of window
         self.app.addLabel("title", "'tenderBot configurator", row=0, colspan=2)
         self.app.addHorizontalSeparator(colspan=2, row=1)
         self.app.addLabel("exposure", "Exposure: ", 2, 0)
@@ -87,9 +87,49 @@ class VisionGui:
         self.app.setScaleRange("closePixels", 1, 20, self.paramclosePixelsValueDefault)
         self.app.showScaleValue("closePixels", show=True)
 
-        self.app.addLabel("colors", "Color of circle:", 15, 0)
+        self.app.addLabel("lowBlue1", "Lower Blue param1:", 15, 0)
+        self.paramlowBlue1Value = self.app.addScale("lowBlue1", 15, 1)
+        self.app.setScaleRange("lowBlue1", 1, 100, self.paramlowBlue1ValueDefault)
+        self.app.showScaleValue("lowBlue1", show=True)
+
+        self.app.addLabel("upBlue1", "Upper Blue param1:", 16, 0)
+        self.paramclosePixelsValue = self.app.addScale("upBlue1", 18, 1)
+        self.app.setScaleRange("upBlue1", 1, 200, self.paramupBlue1ValueDefault)
+        self.app.showScaleValue("upBlue1", show=True)
+
+        self.app.addLabel("lowGreen1", "Lower Green param1:", 17, 0)
+        self.aramupBlue1Value = self.app.addScale("lowGreen1", 17, 1)
+        self.app.setScaleRange("lowGreen1", 1, 50, self.paramlowGreen1ValueDefault)
+        self.app.showScaleValue("lowGreen1", show=True)
+
+        self.app.addLabel("upGreen1", "Upper Green param1:", 18, 0)
+        self.paramupGreen1Value = self.app.addScale("upGreen1", 18, 1)
+        self.app.setScaleRange("upGreen1", 1, 100, self.paramupGreen1ValueDefault)
+        self.app.showScaleValue("upGreen1", show=True)
+
+        self.app.addLabel("lowYel1", "Lower Yellow param1:", 19, 0)
+        self.paramlowYel1Value = self.app.addScale("lowYel1", 19, 1)
+        self.app.setScaleRange("lowYel1", 1, 50, self.paramlowYel1ValueDefault)
+        self.app.showScaleValue("lowYel1", show=True)
+
+        self.app.addLabel("upYel1", "Upper Yellow param1:", 20, 0)
+        self.paramupYel1Value = self.app.addScale("upYel1", 20, 1)
+        self.app.setScaleRange("upYel1", 1, 50, self.paramupYel1ValueDefault)
+        self.app.showScaleValue("upYel1", show=True)
+
+        self.app.addLabel("lowRed1", "Lower Red param1:", 21, 0)
+        self.paramlowRed1Value = self.app.addScale("lowRed1", 21, 1)
+        self.app.setScaleRange("lowRed1", 1, 50, self.paramlowRed1ValueDefault)
+        self.app.showScaleValue("lowRed1", show=True)
+
+        self.app.addLabel("upRed1", "Upper Red param1:", 22, 0)
+        self.paramupRed1Value = self.app.addScale("upRed1", 22, 1)
+        self.app.setScaleRange("upRed1", 1, 50, self.paramupRed1ValueDefault)
+        self.app.showScaleValue("upRed1", show=True)
+
+        self.app.addLabel("colors", "Color of circle:", 23, 0)
         self.paramColorsValue = self.app.addOptionBox("colors", ["all", "green", "blue",
-                                          "yellow", "red"], 15, 1, self.getColorIndex(self.paramColorsValueDefault))
+                                          "yellow", "red"], 23, 1, self.getColorIndex(self.paramColorsValueDefault))
         self.app.setOptionBox("colors", index=self.getColorIndex(self.paramColorsValueDefault), callFunction=False)
 
         self.app.addButton("Save", func=self.saveValues)
