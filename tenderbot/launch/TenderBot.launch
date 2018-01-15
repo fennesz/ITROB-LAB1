@@ -1,7 +1,7 @@
 <launch>
 	<group ns="TenderBot">
 		<!-- TenderBots arm requires launching multiple nodes-->
-		<include file="$(find tenderbot_arm)/launch/TenderBotArm.launch"/>
+		<include file="$(find TenderbotArm)/launch/TenderBotArm.launch"/>
 	    <node name="Vision" pkg="tenderbot_vision" type="tenderbot_vision.py"/>
 		<!-- We will be using a script as input for now 
 		<node name="Input" pkg="tenderbot_input" type="tenderbot_input.py"/>
