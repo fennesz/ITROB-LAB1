@@ -120,7 +120,7 @@ class VisionGui:
 
         self.app.addLabel("lowRed1", "Lower Red param1:", 9, 2)
         self.paramlowRed1Value = self.app.addScale("lowRed1", 9, 3)
-        self.app.setScaleRange("lowRed1", 1, 255, self.paramlowRed1ValueDefault)
+        self.app.setScaleRange("lowRed1", 0, 255, self.paramlowRed1ValueDefault)
         self.app.showScaleValue("lowRed1", show=True)
 
         self.app.addLabel("upRed1", "Upper Red param1:", 10, 2)
