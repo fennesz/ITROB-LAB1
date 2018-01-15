@@ -5,10 +5,17 @@ import rospy
 import os
 import numpy as np
 import math
+from collections import deque
+import time
 from geometry_msgs.msg import Vector3
 from std_msgs.msg import Float32, Float64, Bool
 from dynamixel_msgs.msg import JointState
-from manipulator_arm.srv import *
+
+# For some reason it would not generate correct service files
+# with the package being named "tenderbot_arm"
+from TenderbotArm.srv import *
+
+
 
 
 node_name = "Arm"
@@ -35,10 +42,14 @@ class TenderBotArm(object):
     corrected_angles = [0, 0, 0, 0]
     
     # correction variables
-    angle_offsets =    [-3.14 / 2, -3.14 / 2, 3.14 / 2, 0]
+    angle_offsets = [-3.14 / 2, -3.14 / 2, 3.14 / 2, 0]
+    #angle_offsets = [0,0,0,0]
     
-    # Base offset
-    base_offset = [36, 6, 0]
+    min_max_angles = 1.9
+    
+    # Baqse offset
+    #base_offset = [36, 6, 0]
+    base_offset = [0, 0, 0]
 
     # 3d vector of the effectors position
     effector_pos_x = 0.0
@@ -62,13 +73,12 @@ class TenderBotArm(object):
     # Services
     desired_pos_service = None
     desired_angle_service = None
+    add_point_to_path_service = None
     
     # ctor, start service
     def __init__(self):
         cur_dir = os.path.dirname(os.path.realpath(__file__))
-
         self.__setup_services()
-        pass
 
     @n.subscriber(rospy.get_namespace() + "joint1/state", JointState)
     @n.subscriber(rospy.get_namespace() + "joint2/state", JointState)
@@ -81,24 +91,25 @@ class TenderBotArm(object):
             found_index = int(state.name[5]) - 1
             self.raw_angles[found_index] = state.current_pos;
             self.update_corrected_angle(found_index)
+        elif(state.name == "gripper"):
+            self.effector_angle = state.current_pos
     
     @n.publisher(rospy.get_namespace() + "joint1/command", Float64)
     def set_joint1_angle(self, angle):
-        return max(min(angle, 1.57), -1.57)
+        return max(min(angle, self.min_max_angles), -self.min_max_angles)
     
     @n.publisher(rospy.get_namespace() + "joint2/command", Float64)
     def set_joint2_angle(self, angle):
-        return max(min(angle, 1.57), -1.57)
+        return max(min(angle, self.min_max_angles), -self.min_max_angles)
     
     @n.publisher(rospy.get_namespace() + "joint3/command", Float64)
     def set_joint3_angle(self, angle):
-        return max(min(angle, 1.57), -1.57)
+        return max(min(angle, self.min_max_angles), -self.min_max_angles)
     
     @n.publisher(rospy.get_namespace() + "joint4/command", Float64)
     def set_joint4_angle(self, angle):
-        return max(min(angle, 1.57), -1.57)
+        return max(min(angle, self.min_max_angles), -self.min_max_angles)
         
-    
     def update_corrected_angle(self, index):
         self.corrected_angles[index] = self.correct_angle(self.raw_angles[index], index)
     
@@ -112,13 +123,15 @@ class TenderBotArm(object):
             rotations.append(self.joint_states["joint2"].current_pos)
             rotations.append(self.joint_states["joint3"].current_pos)
             rotations.append(self.joint_states["joint4"].current_pos)
+            
+            parameters = self.dh
+            for i in range(0, len(self.corrected_angles)): # Set the DH parameters to match current rotation
+                parameters[i][0] = self.corrected_angles[i]
             # FKine here to find effector position
-            # pos_vector = FKine()
-            # self.effector_pos_x = 0
-            # self.effector_pos_x = 0
-            # self.effector_pos_x = 0
-            # Also update rotation of end effector
-            # self.effector_angle = 0
+            pos_vector = self.fkine(parameters)
+            self.effector_pos_x = pos_vector[0]
+            self.effector_pos_y = pos_vector[1]
+            self.effector_pos_z = pos_vector[2]
 
     # Publishes the end effector position
     @n.publisher(node_name + "/effector_pos", Vector3)
@@ -145,29 +158,34 @@ class TenderBotArm(object):
 
     # Private function that sets up the service handlers
     def __setup_services(self):
-        self.desired_pos_service = rospy.Service(node_name + '/set_desired_pos',     # Name of service
-                                                 set_desired_pos,                   # Service to implement
-                                                 self.handle_set_desired_pos)       # Handler for service
-        self.desired_angle_service = rospy.Service(node_name + '/set_desired_angle', # Name of service
-                                                   set_desired_angle,               # Service to implement
-                                                   self.handle_set_desired_angle)   # Handler for service
+        self.desired_pos_service = rospy.Service(node_name + '/set_desired_pos',         # Name of service
+                                                 add_point,                              # Service to implement
+                                                 self.handle_set_desired_pos)            # Handler for service
+        self.add_point_to_path_service = rospy.Service(node_name + '/add_point_to_path', # Name of service
+                                                 add_point,                              # Service to implement
+                                                 self.add_point_to_path)                 # Handler for service
+        self.desired_angle_service = rospy.Service(node_name + '/set_desired_angle',     # Name of service
+                                                   set_desired_angle,                    # Service to implement
+                                                   self.handle_set_desired_angle)        # Handler for service
         
     # function that handles requests to the position service
     def handle_set_desired_pos(self, req):
-        # Set desired effector pos
-        self.desired_pos_x = req.x
-        self.desired_pos_y = req.y
-        self.desired_pos_z = req.z
+        rospy.loginfo(req)
+        if(not self.check_if_pos_possible([req.x, req.y, req.z])):
+            return add_pointResponse(False)
+        self.path_points.clear() # Reset queue
+        self.add_point_to_path(req)
         
-        #Test
-        angles = self.ikine([-req.y, req.x, req.z])
-        rospy.loginfo(angles)
+        return add_pointResponse(True)
+
+    def check_if_pos_possible(self, pos):
+        return self.ikine(pos) != None
+
+    def set_angles(self, angles):
         self.set_joint1_angle(angles[0])
         self.set_joint2_angle(angles[1])
         self.set_joint3_angle(angles[2])
         self.set_joint4_angle(angles[3])
-        
-        return set_desired_posResponse(True)
 
     # function that handles requests to the angle service
     def handle_set_desired_angle(self, req):
@@ -175,83 +193,95 @@ class TenderBotArm(object):
         self.desired_angle = req.angle
         return set_desired_angleResponse(True)
 
+    path_points = deque()
+    
+    def add_point_to_path(self, req):
+        if(not self.check_if_pos_possible([req.x, req.y, req.z])):
+            return add_pointResponse(False)
+        self.path_points.append([req.x, req.y, req.z])
+        return add_pointResponse(True)
+    
+    def move_along_path(self):
+        #Constants
+        diffConst = 4 # Already squared
+        if(self.moving):
+            dist = (self.desired_pos_x - self.effector_pos_x)**2 + (self.desired_pos_y - self.effector_pos_y)**2 + (self.desired_pos_z - self.effector_pos_z)**2
+            rospy.loginfo(dist)
+            if(dist < diffConst):
+                self.path_points.popleft()
+                self.moving = False
+        else:
+            if(len(self.path_points) != 0):
+                self.moving = True
+                self.desired_pos_x = self.path_points[0][0]
+                self.desired_pos_y = self.path_points[0][1]
+                self.desired_pos_z = self.path_points[0][2]
+                angles = self.ikine([self.desired_pos_x, self.desired_pos_y, self.desired_pos_z, 0]) # Find out how to handle gripper rotation
+                self.set_angles(angles)
+
     @n.main_loop(frequency=30)
     def run(self):
-        pass
+        # update info
+        self.update_effector_info()
+        
+        # Run work
+        self.move_along_path()
+        
+        # Publish variables
+        self.publish_effector_pos()
+        self.publish_moving()
+        self.publish_effector_angle()
 
-
-
-
-
-    # Example of IKine from teachers, figure out something else
-    # I have no idea how it works
     def ikine(self, pos_coords):
+        # Robots base position
+        Prx = 0
+        Pry = self.dh[0][1]
         
-        test = "\n"
+        # Points position
+        Px = math.sqrt(pos_coords[0]**2 + pos_coords[1]**2)
+        Py = pos_coords[2]
         
-        # Get DH parameters
-        d1 = self.dh[0][1]
-        a1 = self.dh[0][2]
-        a2 = self.dh[1][2]
-        d4 = self.dh[3][1]
+        # Robot lengths
+        Len1 = self.dh[1][2]
+        Len2 = self.dh[3][1]
         
-        test = test + "DH: d1 " + str(d1) + " a1 " + str(a1) + " a2 " + str(a2) + " d4 " + str(d4) + "\n"
+        # Distance from first joint to point
+        Dist = math.sqrt((Px - Prx)**2 + (Py - Pry)**2)
         
-        xc = pos_coords[0]
-        yc = pos_coords[1]
-        zc = pos_coords[2]
+        if(Dist > (Len1 + Len2)):
+            return None
         
-        test = test + "XYZ: " + str(xc) + ", " + str(yc) + ", "+ str(zc) + "\n"
+        D1 = math.atan2(Py - Pry, Px - Prx)
         
-        # Base rotation
-        q1 = math.atan2(yc, xc)
+        D2 = math.acos((Dist**2 + Len1**2 - Len2**2) / (2 * Dist * Len1)) # Law of Cosines
         
-        test = test + "q1: " + str(q1) + "\n"
+        # Base angle
+        A1 = math.atan2(-pos_coords[0], pos_coords[1])
         
-        # Radius squared
-        r2 = math.pow((xc - a1 * math.cos(q1)), 2) + math.pow((yc - a1 * math.sin(q1)), 2)
+        # First joint angle
+        A2 = D1 + D2
         
-        test = test + "r2: " + str(r2) + "\n"
+        A2 = A2 - (math.pi / 2) # Correction
         
-        s = zc - d1
+        # Second joint angle
+        A3 = math.acos((Len1**2 + Len2**2 - Dist**2) / (2 * Len1 * Len2)) # Law of Cosines
+        A3 = A3 - math.pi
         
-        test = test + "s: " + str(s) + "\n"
+        if(abs(A1) > self.min_max_angles or abs(A2) > self.min_max_angles or abs(A3) > self.min_max_angles):
+            return None
         
-        D = (r2 + math.pow(s, 2) - math.pow(a2, 2) - math.pow(d4, 2)) / (2 * a2 * d4)
+        # I have no idea how to handle gripper rotation
         
-        test = test + "D: " + str(D) + "\n"
-        
-        # Third theta
-        q3 = math.atan2(-math.sqrt(1 - math.pow(D, 2)), D)
-        
-        # Second theta
-        q2 = math.atan2(s, math.sqrt(r2)) - math.atan2(d4 * math.sin(q3), a2 + d4 * math.cos(q3))
-        
-        # Last theta
-        q4 = 0
-        
-        angles = [q1, q2, q3, q4]
-        
-        #rospy.loginfo([angles])
-        
-        return angles
+        return [A1, A2, A3, 0]
     
     # Forward kinematics
-    def fkine(self, parameters = None):
-        if(parameters == None):
-            parameters = self.dh
-            for i in range(0, len(self.corrected_angles)): # Set the DH parameters to match current rotation
-                parameters[i][0] = self.raw_angles[i]
-                 
+    def fkine(self, parameters):
         HomoMatrix = self.construct_homogeneous_matrix_from_dh(parameters[0][0], parameters[0][1], parameters[0][2], parameters[0][3])
         for i in range(1, len(self.dh)):
             new_matrix = self.construct_homogeneous_matrix_from_dh(parameters[i][0], parameters[i][1], parameters[i][2], parameters[i][3])
             HomoMatrix = np.dot(HomoMatrix, new_matrix)
         
         xyz = [HomoMatrix[0][3], HomoMatrix[1][3], HomoMatrix[2][3]]
-        xyz[0] = xyz[0] + self.base_offset[0]
-        xyz[1] = xyz[1] + self.base_offset[1]
-        xyz[2] = xyz[2] + self.base_offset[2]
         return xyz
         
     

@@ -1,5 +1,5 @@
 <launch>
-	<node name="Arm" pkg="tenderbot_arm" type="tenderbot_arm.py">
+	<node name="Arm" pkg="TenderbotArm" type="tenderbot_arm.py">
 		<rosparam>
         </rosparam>
 	</node>
@@ -15,8 +15,7 @@
                     update_rate: 10
         </rosparam>
     </node>
-    
-   	<rosparam file="$(find tenderbot_arm)/conf/joints.yaml" command="load"/>
+    <rosparam file="$(find TenderbotArm)/conf/joints.yaml" command="load"/>
     <node name="TB_dynamixel_controller_spawner" pkg="dynamixel_controllers" type="controller_spawner.py"
           args="--manager=TB_dynamixel_manager
                 --port=arm_port

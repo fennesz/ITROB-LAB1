@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>tenderbot_arm</name>
+  <name>TenderbotArm</name>
   <version>0.0.0</version>
   <description>The Manipulator package</description>
 
