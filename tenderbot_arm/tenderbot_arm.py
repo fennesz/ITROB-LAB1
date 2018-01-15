@@ -31,7 +31,7 @@ class TenderBotArm(object):
     dh = [
          [ 3.14 / 2,   15.22, 0,    -3.14 / 2 ],
          [-3.14 / 2,   0,     17.2,  0        ],
-         [ 3.14 / 2,   0,     2.5,   3.14 / 2 ],
+         [ 3.14 / 2,   0,     0,     3.14 / 2 ],
          [    0,       23.5,  0,     0        ],
          ]
 
@@ -67,6 +67,10 @@ class TenderBotArm(object):
     # Desired angle of end effector
     desired_angle = 0.0
     
+    # Gripper state
+    desired_open = False
+    gripper_open = False
+    
     # Movingposition
     moving = False;
     
@@ -87,12 +91,14 @@ class TenderBotArm(object):
     @n.subscriber(rospy.get_namespace() + "gripper/state", JointState)
     def update_joint_state(self, state):
         self.joint_states[state.name] = state
-        if(state.name.startswith("joint")):
+        if(state.name.startswith("joint4")):
+            self.effector_angle = state.current_pos
+        elif(state.name.startswith("joint")):
             found_index = int(state.name[5]) - 1
             self.raw_angles[found_index] = state.current_pos;
             self.update_corrected_angle(found_index)
         elif(state.name == "gripper"):
-            self.effector_angle = state.current_pos
+            pass
     
     @n.publisher(rospy.get_namespace() + "joint1/command", Float64)
     def set_joint1_angle(self, angle):
@@ -108,6 +114,10 @@ class TenderBotArm(object):
     
     @n.publisher(rospy.get_namespace() + "joint4/command", Float64)
     def set_joint4_angle(self, angle):
+        return max(min(angle, self.min_max_angles), -self.min_max_angles)
+    
+    @n.publisher(rospy.get_namespace() + "gripper/command", Float64)
+    def set_gripper_angle(self, angle):
         return max(min(angle, self.min_max_angles), -self.min_max_angles)
         
     def update_corrected_angle(self, index):
@@ -155,6 +165,12 @@ class TenderBotArm(object):
         msg = Bool()
         msg.data = self.moving
         return msg
+    
+    @n.publisher(node_name + "/gripper_open", Bool)
+    def publish_gripper_open(self):
+        msg = Bool()
+        msg.data = self.gripper_open
+        return msg
 
     # Private function that sets up the service handlers
     def __setup_services(self):
@@ -170,8 +186,7 @@ class TenderBotArm(object):
         
     # function that handles requests to the position service
     def handle_set_desired_pos(self, req):
-        rospy.loginfo(req)
-        if(not self.check_if_pos_possible([req.x, req.y, req.z])):
+        if(not self.check_if_pos_possible([req.x, req.y, req.z, req.angle])):
             return add_pointResponse(False)
         self.path_points.clear() # Reset queue
         self.add_point_to_path(req)
@@ -186,28 +201,39 @@ class TenderBotArm(object):
         self.set_joint2_angle(angles[1])
         self.set_joint3_angle(angles[2])
         self.set_joint4_angle(angles[3])
+        
+    def close_gripper(self):
+        self.set_gripper_angle(0)
+        self.gripper_open = False
+    
+    def open_gripper(self):
+        self.set_gripper_angle(1)
+        self.gripper_open = True
 
     # function that handles requests to the angle service
     def handle_set_desired_angle(self, req):
         # Set desired effector pos
         self.desired_angle = req.angle
+        self.set_joint4_angle(self.desired_angle)
         return set_desired_angleResponse(True)
 
     path_points = deque()
     
     def add_point_to_path(self, req):
-        if(not self.check_if_pos_possible([req.x, req.y, req.z])):
+        if(not self.check_if_pos_possible([req.x, req.y, req.z, req.angle])):
             return add_pointResponse(False)
-        self.path_points.append([req.x, req.y, req.z])
+        self.path_points.append([req.x, req.y, req.z, req.angle])
         return add_pointResponse(True)
     
+    #Constants
+    diffConst = 4 # Already squared
+    rotConst = 0.2 # Also squared
     def move_along_path(self):
-        #Constants
-        diffConst = 4 # Already squared
         if(self.moving):
             dist = (self.desired_pos_x - self.effector_pos_x)**2 + (self.desired_pos_y - self.effector_pos_y)**2 + (self.desired_pos_z - self.effector_pos_z)**2
-            rospy.loginfo(dist)
-            if(dist < diffConst):
+            rot = abs(self.desired_angle - self.effector_angle)
+            rospy.loginfo(str(dist) + " " + str(rot))
+            if(dist < self.diffConst and rot < self.rotConst):
                 self.path_points.popleft()
                 self.moving = False
         else:
@@ -216,7 +242,8 @@ class TenderBotArm(object):
                 self.desired_pos_x = self.path_points[0][0]
                 self.desired_pos_y = self.path_points[0][1]
                 self.desired_pos_z = self.path_points[0][2]
-                angles = self.ikine([self.desired_pos_x, self.desired_pos_y, self.desired_pos_z, 0]) # Find out how to handle gripper rotation
+                self.desired_angle = self.path_points[0][3]
+                angles = self.ikine([self.desired_pos_x, self.desired_pos_y, self.desired_pos_z, self.desired_angle])
                 self.set_angles(angles)
 
     @n.main_loop(frequency=30)
@@ -231,15 +258,16 @@ class TenderBotArm(object):
         self.publish_effector_pos()
         self.publish_moving()
         self.publish_effector_angle()
+        self.publish_gripper_open()
 
-    def ikine(self, pos_coords):
+    def ikine(self, pos):
         # Robots base position
         Prx = 0
         Pry = self.dh[0][1]
         
         # Points position
-        Px = math.sqrt(pos_coords[0]**2 + pos_coords[1]**2)
-        Py = pos_coords[2]
+        Px = math.sqrt(pos[0]**2 + pos[1]**2)
+        Py = pos[2]
         
         # Robot lengths
         Len1 = self.dh[1][2]
@@ -256,7 +284,7 @@ class TenderBotArm(object):
         D2 = math.acos((Dist**2 + Len1**2 - Len2**2) / (2 * Dist * Len1)) # Law of Cosines
         
         # Base angle
-        A1 = math.atan2(-pos_coords[0], pos_coords[1])
+        A1 = math.atan2(-pos[0], pos[1])
         
         # First joint angle
         A2 = D1 + D2
@@ -267,12 +295,12 @@ class TenderBotArm(object):
         A3 = math.acos((Len1**2 + Len2**2 - Dist**2) / (2 * Len1 * Len2)) # Law of Cosines
         A3 = A3 - math.pi
         
-        if(abs(A1) > self.min_max_angles or abs(A2) > self.min_max_angles or abs(A3) > self.min_max_angles):
+        if(abs(A1) > self.min_max_angles or abs(A2) > self.min_max_angles or abs(A3) > self.min_max_angles or abs(pos[3]) > self.min_max_angles):
             return None
         
         # I have no idea how to handle gripper rotation
         
-        return [A1, A2, A3, 0]
+        return [A1, A2, A3, pos[3]]
     
     # Forward kinematics
     def fkine(self, parameters):
