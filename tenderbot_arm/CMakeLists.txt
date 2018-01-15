@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(tenderbot_arm)
+project(TenderbotArm)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -53,7 +53,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate services in the 'srv' folder
 add_service_files(
   FILES
-  set_desired_pos.srv
+  add_point.srv
   set_desired_angle.srv
 )
 
@@ -84,6 +84,7 @@ catkin_package(
 #  LIBRARIES Manipulator
 #  CATKIN_DEPENDS roshelper rospy
 #  DEPENDS system_lib
+CATKIN_DEPENDS message_runtime
 )
 
 ###########
