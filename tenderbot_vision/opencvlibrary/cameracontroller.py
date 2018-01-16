@@ -20,7 +20,7 @@ class CameraController:
             print "Connection to webcam lost"
         return image
 
-    def get_shapes(self, image, color=None, Debug=True):
+    def get_shapes(self, image, color=None, Debug=True, show=False):
         if color is None:
             color = self.cfgAccess.data['circleColor']
         imgPreparer = PrepareImage(image=image, cfgAccessor=self.cfgAccess)
@@ -32,7 +32,11 @@ class CameraController:
         if Debug:
             lol = objectRgn.draw_circles(circles=circles, image=image)
             Debugger.show_image(lol, fps=self.cfgAccess.data['webcamFPS'])
-            Debugger.show_image(treshholded_img, fps=self.cfgAccess.data['webcamFPS'], name="DebugTreshold")
+            if show:
+                treshold_img_name = color + "_treshold"
+                Debugger.show_image(treshholded_img, fps=self.cfgAccess.data['webcamFPS'], name=treshold_img_name)
+                single_channelImg_name = color + "_singleChannel"
+                Debugger.show_image(single_channelImg, fps=self.cfgAccess.data['webcamFPS'], name=single_channelImg_name)
         return circles
 
     def stop(self):
