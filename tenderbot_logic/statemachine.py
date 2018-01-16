@@ -1,24 +1,13 @@
-import roshelper
-from std_msgs.msg import String
 from threading import Timer
 from transitions import Machine, State, Transition
 
 # github.com/pytransitions/transitions
-
-node_input = "Input"
-node_vision = "Vision"
-node_arm = "Arm"
-
-i = roshelper.Node(node_input, anonymous=False)
-v = roshelper.Node(node_vision, anonymous=False)
-a = roshelper.Node(node_arm, anonymous=False)
 
 class TenderBotStateMachine(object):
     drinkchoice = 0
     
     states = [
                State(name='initial'),
-               State(name='setup', on_enter='enter_setup'),
                State(name='calibration', on_enter='enter_calibration', on_exit="exit_calibration"),
                State(name='idle', on_enter='enter_idle'),
                State(name='mix_drink', on_enter='enter_mix_drink'),
@@ -26,8 +15,7 @@ class TenderBotStateMachine(object):
                State(name='done')
              ]
     transitions = [
-                    {'trigger': 'start', 'source': 'initial', 'dest': 'setup'},
-                    {'trigger': 'setup_completed', 'source': 'setup', 'dest': 'calibration'}, 
+                    {'trigger': 'start', 'source': 'initial', 'dest': 'calibration'},
                     {'trigger': 'calibration_completed', 'source': 'calibration', 'dest': 'idle'},
                     {'trigger': 'drink_picked', 'source': 'idle', 'dest': 'mix_drink'},
                     {'trigger': 'drink_mixed', 'source': 'mix_drink', 'dest': 'idle'},
@@ -37,50 +25,37 @@ class TenderBotStateMachine(object):
                   ]
     machine = None
     currentTask = None
-
-    @i.subscriber("/input", String)
-    def listener(word):
-        rospy.loginfo(rospy.get_caller_id() + " : I heard %s" % word.data)
+    rosnode = None
 
     def update(self):
         if self.currentTask is not None:
             self.currentTask()
  
-    def __init__(self):
+    def __init__(self, rosnode):
+        self.rosnode = rosnode
         self.machine = Machine(model=self, states=self.states, transitions=self.transitions, initial='initial', queued=True)
     
-    def enter_initial(self):
-        self.start()
-
-    def enter_setup(self):        
-        self.currentTask = None
-        print "enter_setup"
-        #Subscribe to input topic        
-        #Subscribe to shape
-        #Subscribe to arm
-        self.setup_completed()
-
     def enter_calibration(self):
-        self.currentTask = None
-        #Perform calibration routine
         print "enter_calibration"
-        self.calibration_completed()
+        t = Timer(5.0, lambda: self.calibration_completed())
+        t.start()
         
     def exit_calibration(self):
         print "exit_calibration"
         
     def enter_idle(self):
-        self.currentTask = None
         print "enter_idle"
+        self.drink_picked()
         
     def enter_error(self):
-        self.currentTask = None
         print "enter_error"
         
     def enter_mix_drink(self):
-        self.currentTask = None
         print "enter_mix_drink"
+        self.currentTask = self.rosnode.mix_drink
+    
+    def exit_mix_drink(self):
+        self.currentTask = None
         
     def enter_done(self):
-        self.currentTask = None
         print "enter_done"
