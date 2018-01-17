@@ -5,9 +5,12 @@ from opencvlibrary.configaccess import ConfigAccessor
 from opencvlibrary.cameracontroller import CameraController
 import roshelper
 from sensor_msgs.msg import Image as ImageMessage
+from rospy.numpy_msg import numpy_msg
+from std_msgs.msg import Float32MultiArray
 #from tenderbot_vision.msg import ShapeMessage
 from camera_sensor.srv import *
 import rospy
+import numpy
 
 nodeName = "Vision" # Figure out how to set this from
                     # Arguments
@@ -63,10 +66,14 @@ class TenderBotVision(object):
         return msg
 
     # Publishes the shapes red
-    @n.publisher(nodeName + "/shapes/red", ImageMessage)
+    @n.publisher(nodeName + "/shapes/red", Float32MultiArray)
     def publish_shapes_red(self):
-        msg = ImageMessage()
-        msg.data = self.cameraController.get_shapes(self.currentRawImage, color='red', show=True)
+        msg = Float32MultiArray()
+        shapes = self.cameraController.get_shapes(self.currentRawImage, color='red', show=True)
+        if shapes is None:
+            shapes = float[0]
+        msg.data = shapes.astype(float)
+        rospy.loginfo(str(type(msg.data)))
         return msg
 
     # Publishes the shapes green

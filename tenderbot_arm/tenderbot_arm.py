@@ -232,7 +232,7 @@ class TenderBotArm(object):
         if(self.moving):
             dist = (self.desired_pos_x - self.effector_pos_x)**2 + (self.desired_pos_y - self.effector_pos_y)**2 + (self.desired_pos_z - self.effector_pos_z)**2
             rot = abs(self.desired_angle - self.effector_angle)
-            rospy.loginfo(str(dist) + " " + str(rot))
+            #rospy.loginfo(str(dist) + " " + str(rot))
             if(dist < self.diffConst and rot < self.rotConst):
                 self.path_points.popleft()
                 self.moving = False

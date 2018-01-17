@@ -1,6 +1,8 @@
 #!/bin/sh
 cd ~/catkin_ws
 roscore &
+sleep 3
+xterm -e "bash -c \"rostopic echo /rosout > tenderLog.log; exec bash\"" &
 sleep 1
 catkin_make
 sleep 1

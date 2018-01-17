@@ -5,10 +5,14 @@ import rospy
 from statemachine import TenderBotStateMachine
 from sensor_msgs.msg import Image as ImageMsg
 from std_msgs.msg import Int32
+from std_msgs.msg import Float32MultiArray
 from geometry_msgs.msg import Vector3
 
 from TenderbotArm.srv import add_point as add_point_srv
 
+from rospy.numpy_msg import numpy_msg
+from rospy_tutorials.msg import Floats
+import numpy
 node_name = "Logic"
 
 n = roshelper.Node(node_name, anonymous=False)
@@ -46,18 +50,21 @@ class TenderBotLogic(object):
     def force_arm_pos(self, pos):
         return pos
     
-    @n.subscriber(rospy.get_namespace() + "Vision/shapes", ImageMsg)
+    @n.subscriber(rospy.get_namespace() + "Vision/shapes/red", Float32MultiArray)
     def get_shapes(self, shapes):
-        self.shapes = shapes
+        self.shapes = shapes.data
     
     @n.subscriber(rospy.get_namespace() + "Arm/effector_pos", Vector3)
     def get_effector_pos(self, pos):
         self.effector_pos = pos
-        
+
     def mix_drink(self):
         
         self.drink_choice = 0 # TESTESTESTETSTEST
-        
+        if (self.shapes is not None):
+            rospy.loginfo(self.shapes)
+            self.add_arm_point(self.shapes[0], self.shapes[1], 30, 0)  # Move over cup
+        '''
         if(self.current_ingredient == None): # Start mixing
             #rospy.loginfo("Start mix")
             self.current_ingredient = 0
@@ -71,6 +78,7 @@ class TenderBotLogic(object):
             self.add_arm_point(pos[0], pos[1], 30, 0)      # Move over cup
             self.add_arm_point(pos[0], pos[1], pos[2], pos[3])  # Move to cup
             self.current_ingredient = self.current_ingredient + 1
+        '''
         
     
     # ctor
